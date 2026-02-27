@@ -66,6 +66,7 @@
         </div>
 
         <div class="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-slate-500 flex items-center gap-2"></div>
             <button type="submit" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3.5 rounded-xl transition-all shadow-md shadow-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/40 transform hover:-translate-y-0.5">
                 Save & Share Paste
             </button>
