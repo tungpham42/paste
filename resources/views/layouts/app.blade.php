@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta
+      name="description"
+      content="SOFT Paste - Your go-to platform for sharing code snippets and text online with ease and security."
+    />
+    <meta property="og:image" content="{{ asset('1200x630.jpg') }}" />
+    <meta
+      property="og:image:alt"
+      content="SOFT Paste - Your go-to platform for sharing code snippets and text online with ease and security."
+    />
+    <meta property="og:image:type" content="image/jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <title>@yield('title', 'SOFT Paste')</title>
 
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
@@ -22,6 +34,26 @@
     </style>
 
     @stack('styles')
+
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-HHXZSNQ65X"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-HHXZSNQ65X");
+    </script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585118770961536"
+      crossorigin="anonymous"
+    ></script>
 </head>
 <body class="text-slate-800 antialiased selection:bg-indigo-100 selection:text-indigo-900 flex flex-col min-h-screen">
 
