@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Google_Client;
 
 class GoogleOneTapController extends Controller
@@ -25,6 +27,7 @@ class GoogleOneTapController extends Controller
                     'name' => $payload['name'],
                     'email' => $payload['email'],
                     'avatar' => $payload['picture'] ?? null, // Capture the avatar URL
+                    'password' => Hash::make(Str::random(32))
                 ]
             );
 

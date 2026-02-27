@@ -14,7 +14,8 @@ class User extends Authenticatable
         'email',
         'google_id',
         'is_pro',
-        'avatar'
+        'avatar',
+        'password'
     ];
 
     public function pastes()
