@@ -38,7 +38,7 @@ Route::post('/pastes/{paste}/unlock', [PasteController::class, 'unlock'])->name(
 // -----------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::delete('/pastes/{paste}', [PasteController::class, 'destroy'])->name('pastes.destroy');
+    Route::delete('/pastes/{slug}', [PasteController::class, 'destroy'])->name('pastes.destroy');
     Route::post('/logout', [GoogleOneTapController::class, 'logout'])->name('logout');
 });
 

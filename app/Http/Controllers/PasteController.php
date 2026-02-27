@@ -97,13 +97,17 @@ class PasteController extends Controller
     /**
      * Delete the specified paste.
      */
-    public function destroy(Paste $paste)
+    public function destroy($slug)
     {
-        // Ensure the logged-in user actually owns this paste
+        // 1. Fetch the paste by slug, explicitly ignoring the 'active' global scope
+        $paste = Paste::withoutGlobalScopes()->where('slug', $slug)->firstOrFail();
+
+        // 2. Ensure the logged-in user actually owns this paste
         if ($paste->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
+        // 3. Delete it
         $paste->delete();
 
         return redirect()->route('dashboard')->with('success', 'Your snippet has been deleted successfully.');
