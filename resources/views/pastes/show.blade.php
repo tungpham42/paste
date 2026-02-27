@@ -23,7 +23,7 @@
             <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
                 <span class="bg-slate-100 text-slate-600 px-3 py-1.5 rounded-md flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                    {{ $paste->user_id ? $paste->user->name : 'Guest' }}
+                    {{ $paste->user?->name ?? 'Guest' }}
                 </span>
 
                 <span class="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-md flex items-center gap-1 uppercase">
