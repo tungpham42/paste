@@ -23,6 +23,7 @@ class PasteController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
             'content' => 'required|string|max:524288', // 512KB limit
             'syntax' => 'required|string',
             'visibility' => 'required|in:public,unlisted,private',
@@ -34,7 +35,7 @@ class PasteController extends Controller
             'user_id' => auth()->id(), // Will be null if guest
             'slug' => Str::random(8),
             // Set a default title based on syntax or just 'Untitled Snippet'
-            'title' => 'Untitled ' . strtoupper($validated['syntax'] === 'plaintext' ? 'Snippet' : $validated['syntax']),
+            'title' => filled($validated['title']) ? $validated['title'] : 'Untitled ' . strtoupper($validated['syntax'] === 'plaintext' ? 'Snippet' : $validated['syntax']),
             'content' => $validated['content'],
             'syntax' => $validated['syntax'],
             'visibility' => $validated['visibility'],

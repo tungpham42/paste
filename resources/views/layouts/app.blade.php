@@ -91,7 +91,7 @@
                     client_id: '{{ config('services.google.client_id') }}',
                     callback: handleCredentialResponse,
                     auto_select: false, // Set to true if you want returning users to auto-login without clicking
-                    cancel_on_tap_outside: false
+                    cancel_on_tap_outside: true // Users can click outside the prompt to dismiss it
                 });
 
                 // Show the floating Google One Tap prompt on the right side
