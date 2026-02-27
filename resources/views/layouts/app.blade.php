@@ -58,15 +58,54 @@
 
     @stack('scripts')
     @guest
-    <!--- Google One Tap Sign-in -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script>
+            function handleCredentialResponse(response) {
+                // Send the securely signed Google token to our Laravel backend
+                fetch('{{ route('auth.google.verify') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ credential: response.credential })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // If login is successful, reload the page to update the UI
+                        window.location.reload();
+                    } else {
+                        console.error('Login Failed:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Network Error:', error);
+                });
+            }
 
-    <div id="g_id_onload"
-        data-client_id="{{ config('services.google.client_id') }}"
-        data-login_uri="{{ route('auth.google.verify') }}"
-        data-auto_prompt="true"
-        data-position="top_right">
-    </div>
+            window.onload = function () {
+                google.accounts.id.initialize({
+                    client_id: '{{ config('services.google.client_id') }}',
+                    callback: handleCredentialResponse,
+                    auto_select: false, // Set to true if you want returning users to auto-login without clicking
+                    cancel_on_tap_outside: false
+                });
+
+                // Show the floating Google One Tap prompt on the right side
+                google.accounts.id.prompt();
+
+                // Bind the manual login button in your navigation bar
+                const loginBtn = document.getElementById('google-login-btn');
+                if(loginBtn) {
+                    loginBtn.addEventListener('click', () => {
+                        // If they closed the prompt, this forces it to appear again
+                        google.accounts.id.prompt();
+                    });
+                }
+            }
+        </script>
     @endguest
 </body>
 </html>
