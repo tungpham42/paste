@@ -41,4 +41,14 @@ class GoogleOneTapController extends Controller
 
         return response()->json(['message' => 'Authentication failed'], 401);
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')->with('status', 'You have been safely logged out.');
+    }
 }

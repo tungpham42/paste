@@ -6,6 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SOFT Paste')</title>
 
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -41,6 +46,13 @@
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
                     @endif
+
+                    <form method="POST" action="{{ route('logout') }}" class="ml-2">
+                        @csrf
+                        <button type="submit" class="text-sm font-semibold text-slate-500 hover:text-rose-600 transition-colors p-2 rounded-md hover:bg-rose-50" title="Log Out">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        </button>
+                    </form>
                 </div>
             </div>
         @else
@@ -108,5 +120,34 @@
             }
         </script>
     @endguest
+    @if (session('status') || session('success'))
+        <div id="toast-alert" class="fixed bottom-6 right-6 z-50 flex items-center w-full max-w-sm p-4 text-slate-600 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 transition-all duration-500 transform translate-y-0 opacity-100" role="alert">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-10 h-10 text-emerald-500 bg-emerald-50 rounded-xl border border-emerald-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="ml-3 text-sm font-semibold text-slate-700">
+                {{ session('status') ?? session('success') }}
+            </div>
+            <button type="button" onclick="closeToast()" class="ml-auto -mx-1.5 -my-1.5 bg-white text-slate-400 hover:text-rose-500 rounded-lg focus:ring-2 focus:ring-slate-100 p-1.5 hover:bg-slate-50 inline-flex h-8 w-8 items-center justify-center transition-colors">
+                <span class="sr-only">Close</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <script>
+            // Function to smoothly animate the toast away
+            function closeToast() {
+                const toast = document.getElementById('toast-alert');
+                if (toast) {
+                    toast.classList.remove('translate-y-0', 'opacity-100');
+                    toast.classList.add('translate-y-4', 'opacity-0');
+                    setTimeout(() => toast.remove(), 500); // Wait for transition to finish
+                }
+            }
+
+            // Auto-dismiss after 4 seconds
+            setTimeout(closeToast, 4000);
+        </script>
+    @endif
 </body>
 </html>
