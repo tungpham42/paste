@@ -29,7 +29,16 @@ Route::middleware('auth')->group(function () {
 // -----------------------------------------------------------------------------
 // Wildcard Route (Must go LAST)
 // -----------------------------------------------------------------------------
-// This allows short, clean URLs like: softpaste.com/aB8x9Z
-Route::get('/{paste}', [PasteController::class, 'show'])->name('pastes.show');
 
 Route::post('/auth/google/verify', [GoogleOneTapController::class, 'verify'])->name('auth.google.verify');
+
+// -----------------------------------------------------------------------------
+// Sitemap Route (MUST go above the wildcard)
+// -----------------------------------------------------------------------------
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+// -----------------------------------------------------------------------------
+// Wildcard Route (Must go LAST)
+// -----------------------------------------------------------------------------
+// This allows short, clean URLs like: softpaste.com/aB8x9Z
+Route::get('/{paste}', [PasteController::class, 'show'])->name('pastes.show');

@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /auth/
+Disallow: /*/unlock
+
+# Point crawlers directly to your dynamic sitemap
+Sitemap: https://paste.soft.io.vn/sitemap.xml
