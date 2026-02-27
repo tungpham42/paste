@@ -66,6 +66,9 @@ class PasteController extends Controller
             }
         }
 
+        // 3. Eager load the user relationship to display the name
+        $paste->load('user');
+
         return view('pastes.show', compact('paste'));
     }
 
