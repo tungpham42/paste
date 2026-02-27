@@ -30,13 +30,20 @@
 
 @push('scripts')
 <script>
-    // Use an interval to wait for the Google GIS library to initialize in app.blade.php
     const renderGoogleButton = setInterval(() => {
         if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
 
-            // Determine the current theme to style the Google button correctly
+            // 1. Explicitly initialize here to bypass the window.onload delay in app.blade.php.
+            // This guarantees the client is ready before we attempt to render the button.
+            google.accounts.id.initialize({
+                client_id: '{{ config('services.google.client_id') }}',
+                callback: handleCredentialResponse,
+            });
+
+            // 2. Determine the current theme
             const isDark = document.documentElement.classList.contains('dark');
 
+            // 3. Render the standard button (This bypasses any One Tap rate limits/thresholds)
             google.accounts.id.renderButton(
                 document.getElementById("google-signin-button"),
                 {
@@ -52,7 +59,7 @@
         }
     }, 100);
 
-    // Optional: Re-render the button if the user toggles dark mode while on the page
+    // Re-render the button if the user toggles dark mode while on the page
     document.getElementById('theme-toggle')?.addEventListener('click', () => {
         setTimeout(() => {
             const isDark = document.documentElement.classList.contains('dark');
