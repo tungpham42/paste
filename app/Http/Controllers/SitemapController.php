@@ -9,7 +9,7 @@ class SitemapController extends Controller
 {
     public function index()
     {
-        $pastes = Paste::where('is_public', true)->latest()->get();
+        $pastes = Paste::where('visibility', 'public')->latest()->get();
 
         return response()->view('sitemap', [
             'pastes' => $pastes
