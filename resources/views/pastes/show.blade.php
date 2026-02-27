@@ -4,6 +4,7 @@
 
 @push('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
     <style>
         pre[class*="language-"] {
             border-radius: 0.75rem !important;
@@ -79,7 +80,7 @@
     </div>
 
     <div class="rounded-xl overflow-hidden shadow-sm border border-slate-800 bg-[#272822]">
-        <pre><code class="language-{{ $paste->syntax === 'plaintext' ? 'none' : $paste->syntax }}" id="code-block">{{ $paste->content }}</code></pre>
+        <pre class="line-numbers"><code class="language-{{ $paste->syntax === 'plaintext' ? 'none' : $paste->syntax }}" id="code-block">{{ $paste->content }}</code></pre>
     </div>
 </div>
 @endsection
@@ -90,11 +91,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
     <script>
         function copyCode() {
             const codeBlock = document.getElementById('code-block').innerText;
             navigator.clipboard.writeText(codeBlock).then(() => {
-                // Using a simple alert for now, easily swappable for a toast!
                 alert('✨ Code copied to clipboard!');
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
