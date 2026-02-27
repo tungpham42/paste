@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
 // -----------------------------------------------------------------------------
 
 Route::post('/auth/google/verify', [GoogleOneTapController::class, 'verify'])->name('auth.google.verify');
+Route::view('/login', 'login')->name('login')->middleware('guest');
 
 // -----------------------------------------------------------------------------
 // Sitemap Route (MUST go above the wildcard)
