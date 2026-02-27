@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasteController;
 use App\Http\Controllers\Auth\GoogleOneTapController;
+use App\Http\Controllers\SitemapController;
 
 // -----------------------------------------------------------------------------
 // Public Routes
