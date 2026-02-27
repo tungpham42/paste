@@ -73,11 +73,12 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
-                        // If login is successful, reload the page to update the UI
-                        window.location.reload();
+                    if(data.redirect) {
+                        // Success! Send them to the dashboard
+                        window.location.href = data.redirect;
                     } else {
-                        console.error('Login Failed:', data.message);
+                        console.error('Login failed:', data.message);
+                        alert('Could not log in. Please try again.');
                     }
                 })
                 .catch(error => {
