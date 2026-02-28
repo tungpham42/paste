@@ -42,6 +42,7 @@
 
             <div x-data="{
                 open: false,
+                dropUp: false,
                 value: '{{ old('syntax', 'plaintext') }}',
                 options: {
                     'plaintext': 'None (Plain Text)',
@@ -51,55 +52,82 @@
                     'css': 'CSS',
                     'python': 'Python'
                 },
-                get selectedLabel() { return this.options[this.value]; }
-            }" @click.away="open = false" class="relative">
+                get selectedLabel() { return this.options[this.value]; },
+                reposition() {
+                    if (!this.$refs.button) return;
+                    const rect = this.$refs.button.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    this.dropUp = spaceBelow < 260 && rect.top > spaceBelow;
+                }
+            }"
+            @click.away="open = false"
+            @scroll.window="open ? reposition() : null"
+            @resize.window="open ? reposition() : null">
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Syntax</label>
                 <input type="hidden" name="syntax" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="(label, key) in options" :key="key">
-                        <li @click="value = key; open = false"
-                            class="px-4 py-2.5 cursor-pointer transition-colors"
-                            :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
-                            <span x-text="label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <div class="relative">
+                    <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
+                        <span x-text="selectedLabel"></span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul x-show="open" x-transition.opacity.duration.200ms
+                        :class="dropUp ? 'bottom-full mb-2' : 'top-full mt-2'"
+                        class="absolute z-50 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
+                        <template x-for="(label, key) in options" :key="key">
+                            <li @click="value = key; open = false"
+                                class="px-4 py-2.5 cursor-pointer transition-colors"
+                                :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
+                                <span x-text="label"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
             </div>
 
             <div x-data="{
                 open: false,
+                dropUp: false,
                 value: '{{ old('visibility', 'public') }}',
                 options: [
                     { id: 'public', label: '🌍 Public', disabled: false },
                     { id: 'unlisted', label: '🔗 Unlisted', disabled: false },
                     { id: 'private', label: '🔒 Private @if(!auth()->check()) (Login required) @endif', disabled: {{ !auth()->check() ? 'true' : 'false' }} }
                 ],
-                get selectedLabel() { return this.options.find(o => o.id === this.value).label; }
-            }" @click.away="open = false" class="relative">
+                get selectedLabel() { return this.options.find(o => o.id === this.value).label; },
+                reposition() {
+                    if (!this.$refs.button) return;
+                    const rect = this.$refs.button.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    this.dropUp = spaceBelow < 260 && rect.top > spaceBelow;
+                }
+            }"
+            @click.away="open = false"
+            @scroll.window="open ? reposition() : null"
+            @resize.window="open ? reposition() : null">
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Visibility</label>
                 <input type="hidden" name="visibility" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm @error('visibility') border-rose-500 ring-4 ring-rose-500/20 @enderror">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="option in options" :key="option.id">
-                        <li @click="if(!option.disabled) { value = option.id; open = false }"
-                            class="px-4 py-2.5 transition-colors"
-                            :class="{
-                                'opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500': option.disabled,
-                                'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400': !option.disabled,
-                                'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold': value === option.id && !option.disabled,
-                                'text-slate-700 dark:text-slate-300': value !== option.id && !option.disabled
-                            }">
-                            <span x-text="option.label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <div class="relative">
+                    <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm @error('visibility') border-rose-500 ring-4 ring-rose-500/20 @enderror">
+                        <span x-text="selectedLabel"></span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul x-show="open" x-transition.opacity.duration.200ms
+                        :class="dropUp ? 'bottom-full mb-2' : 'top-full mt-2'"
+                        class="absolute z-50 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
+                        <template x-for="option in options" :key="option.id">
+                            <li @click="if(!option.disabled) { value = option.id; open = false }"
+                                class="px-4 py-2.5 transition-colors"
+                                :class="{
+                                    'opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500': option.disabled,
+                                    'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400': !option.disabled,
+                                    'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold': value === option.id && !option.disabled,
+                                    'text-slate-700 dark:text-slate-300': value !== option.id && !option.disabled
+                                }">
+                                <span x-text="option.label"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
                 @error('visibility')
                     <p class="text-rose-500 dark:text-rose-400 text-sm mt-2 font-medium flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -123,6 +151,7 @@
 
             <div x-data="{
                 open: false,
+                dropUp: false,
                 value: '{{ old('expiration_minutes', '') }}',
                 options: {
                     '': 'Never expire',
@@ -131,23 +160,36 @@
                     '1440': '1 Day',
                     '10080': '1 Week'
                 },
-                get selectedLabel() { return this.options[this.value]; }
-            }" @click.away="open = false" class="relative">
+                get selectedLabel() { return this.options[this.value]; },
+                reposition() {
+                    if (!this.$refs.button) return;
+                    const rect = this.$refs.button.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    this.dropUp = spaceBelow < 260 && rect.top > spaceBelow;
+                }
+            }"
+            @click.away="open = false"
+            @scroll.window="open ? reposition() : null"
+            @resize.window="open ? reposition() : null">
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Expiration</label>
                 <input type="hidden" name="expiration_minutes" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="(label, key) in options" :key="key">
-                        <li @click="value = key; open = false"
-                            class="px-4 py-2.5 cursor-pointer transition-colors"
-                            :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
-                            <span x-text="label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <div class="relative">
+                    <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
+                        <span x-text="selectedLabel"></span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <ul x-show="open" x-transition.opacity.duration.200ms
+                        :class="dropUp ? 'bottom-full mb-2' : 'top-full mt-2'"
+                        class="absolute z-50 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
+                        <template x-for="(label, key) in options" :key="key">
+                            <li @click="value = key; open = false"
+                                class="px-4 py-2.5 cursor-pointer transition-colors"
+                                :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
+                                <span x-text="label"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
             </div>
 
         </div>
