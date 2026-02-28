@@ -11,11 +11,26 @@
             margin: 0 !important;
             box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
         }
+
+        /* Force Wrap overrides for Prism */
+        pre.whitespace-pre-wrap {
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+            padding-left: 1.5rem !important; /* Reset padding when line numbers are hidden */
+        }
+        code.whitespace-pre-wrap {
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+        }
+        /* Hide Prism line numbers when wrapped (physical lines != visual wraps) */
+        pre.whitespace-pre-wrap .line-numbers-rows {
+            display: none !important;
+        }
     </style>
 @endpush
 
 @section('content')
-<div class="max-w-5xl mx-auto w-full bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mt-4 transition-colors">
+<div class="max-w-5xl mx-auto w-full bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mt-4 transition-colors" x-data="{ wrapText: false }">
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 dark:border-slate-800 pb-6 mb-6">
         <div class="flex-1">
@@ -67,6 +82,11 @@
             </div>
 
             <div class="flex shrink-0 gap-3 w-full md:w-auto">
+                <button @click="wrapText = !wrapText" class="flex-1 md:flex-none justify-center flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl transition-all font-semibold shadow-sm"
+                        :class="wrapText ? 'ring-2 ring-indigo-500 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : ''">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                    <span x-text="wrapText ? 'Unwrap' : 'Wrap'"></span>
+                </button>
                 <button onclick="copyCode()" class="flex-1 md:flex-none justify-center flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl transition-all font-semibold shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     Copy
@@ -80,7 +100,7 @@
     </div>
 
     <div class="rounded-xl overflow-hidden shadow-sm border border-slate-800 dark:border-slate-700 bg-[#272822]">
-        <pre class="line-numbers"><code class="language-{{ $paste->syntax === 'plaintext' ? 'none' : $paste->syntax }}" id="code-block">{{ $paste->content }}</code></pre>
+        <pre class="line-numbers" :class="wrapText ? 'whitespace-pre-wrap' : ''"><code class="language-{{ $paste->syntax === 'plaintext' ? 'none' : $paste->syntax }}" id="code-block" :class="wrapText ? 'whitespace-pre-wrap' : ''">{{ $paste->content }}</code></pre>
     </div>
 </div>
 @endsection
@@ -97,7 +117,6 @@
             navigator.clipboard.writeText(codeBlock).then(() => {
                 const isDark = document.documentElement.classList.contains('dark');
 
-                // REPLACED ALERT WITH SWEETALERT TOAST
                 Swal.fire({
                     toast: true,
                     position: 'bottom-end',
@@ -108,7 +127,7 @@
                     timerProgressBar: true,
                     background: isDark ? '#1e293b' : '#ffffff',
                     color: isDark ? '#f8fafc' : '#0f172a',
-                    iconColor: '#10b981' // Tailwind emerald-500
+                    iconColor: '#10b981'
                 });
             }).catch(err => {
                 console.error('Failed to copy text: ', err);

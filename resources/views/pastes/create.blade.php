@@ -25,10 +25,45 @@
             @enderror
         </div>
 
-        <div class="mb-6">
-            <textarea name="content" rows="14"
-                class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-5 font-mono text-sm text-slate-800 dark:text-slate-200 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500 @error('content') border-rose-500 focus:ring-rose-500/20 @enderror"
-                placeholder="Paste your brilliant code or text here..." required>{{ old('content') }}</textarea>
+        <div class="mb-6" x-data="{
+            content: @js(old('content', '')),
+            wrapText: false,
+            get lineCount() {
+                return this.content.split('\n').length || 1;
+            },
+            syncScroll(e) {
+                if(this.$refs.lineNumbers) {
+                    this.$refs.lineNumbers.scrollTop = e.target.scrollTop;
+                }
+            }
+        }">
+            <div class="flex justify-between items-center mb-2 px-1">
+                <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300">Content</label>
+                <button type="button" @click="wrapText = !wrapText"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
+                        :class="wrapText ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                    <span x-text="wrapText ? 'Unwrap Text' : 'Wrap Text'"></span>
+                </button>
+            </div>
+
+            <div class="relative flex w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all @error('content') border-rose-500 focus-within:ring-rose-500/20 @enderror">
+
+                <div x-show="!wrapText"
+                     x-ref="lineNumbers"
+                     class="w-12 flex-shrink-0 text-right pr-3 py-5 font-mono text-sm text-slate-400 dark:text-slate-500 bg-slate-100/50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-700 select-none overflow-hidden"
+                     style="pointer-events: none; display: none;">
+                    <template x-for="i in lineCount" :key="i">
+                        <div x-text="i" class="leading-normal h-[21px]"></div>
+                    </template>
+                </div>
+
+                <textarea name="content" x-model="content" rows="14"
+                    @scroll="syncScroll" @input="syncScroll"
+                    class="w-full bg-transparent p-5 font-mono text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500 leading-normal"
+                    :class="wrapText ? 'whitespace-pre-wrap' : 'whitespace-pre overflow-x-auto'"
+                    placeholder="Paste your brilliant code or text here..." required></textarea>
+            </div>
 
             @error('content')
                 <p class="text-rose-500 dark:text-rose-400 text-sm mt-2 font-medium flex items-center gap-1">
