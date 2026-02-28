@@ -53,6 +53,7 @@
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Author</th>
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Syntax</th>
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Visibility</th>
+                    <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Status</th>
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Created</th>
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400 text-right">Actions</th>
                 </tr>
@@ -74,6 +75,13 @@
                             @elseif($paste->visibility === 'unlisted') 🔗
                             @else 🔒 @endif
                             {{ $paste->visibility }}
+                        </td>
+                        <td class="p-4">
+                            @if($paste->expires_at && $paste->expires_at->isPast())
+                                <span class="bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-rose-100 dark:border-rose-500/20">Expired</span>
+                            @else
+                                <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-emerald-100 dark:border-emerald-500/20">Active</span>
+                            @endif
                         </td>
                         <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $paste->created_at->format('M d, Y H:i') }}</td>
                         <td class="p-4 text-right">
