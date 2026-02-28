@@ -95,7 +95,7 @@
         function copyCode() {
             const codeBlock = document.getElementById('code-block').innerText;
             navigator.clipboard.writeText(codeBlock).then(() => {
-                window.dispatchEvent(new CustomEvent('show-alert', { detail: '✨ Code copied to clipboard!' }));
+                alert('✨ Code copied to clipboard!');
             }).catch(err => console.error('Failed to copy text: ', err));
         }
     </script>
