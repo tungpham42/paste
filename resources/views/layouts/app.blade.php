@@ -385,5 +385,35 @@
             setTimeout(closeToast, 4000);
         </script>
     @endif
+    <script>
+        window.addEventListener('load', function() {
+            // Wait a couple of seconds to give AdSense time to load naturally
+            setTimeout(function() {
+                // If window.adsbygoogle doesn't exist or hasn't been fully loaded, an ad blocker is likely active
+                const isAdBlockActive = typeof window.adsbygoogle === 'undefined' || window.adsbygoogle.loaded !== true;
+
+                // Additionally, check if the ad container itself was forcefully hidden by a cosmetic filter
+                const adContainer = document.querySelector('ins.adsbygoogle');
+                const isHidden = adContainer && window.getComputedStyle(adContainer).display === 'none';
+
+                if (isAdBlockActive || isHidden) {
+                    Swal.fire({
+                        title: 'Ad Blocker Detected 🛑',
+                        html: 'It looks like you are using an ad blocker.<br><br>Ads help keep <strong>SOFT Paste</strong> running and free for everyone. Please consider whitelisting our site!',
+                        icon: 'warning',
+                        confirmButtonText: 'I Understand',
+                        allowOutsideClick: false, // Optional: forces them to click the button
+                        buttonsStyling: false,
+                        customClass: {
+                            popup: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl',
+                            title: 'text-slate-800 dark:text-white font-bold text-xl',
+                            htmlContainer: 'text-slate-500 dark:text-slate-400 mt-2 text-sm leading-relaxed',
+                            confirmButton: 'w-full justify-center flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition-all font-semibold shadow-sm mt-4'
+                        }
+                    });
+                }
+            }, 2000); // 2000ms delay prevents false positives on slow connections
+        });
+    </script>
 </body>
 </html>
