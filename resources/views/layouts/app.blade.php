@@ -186,7 +186,7 @@
 
     <main class="p-6 flex-grow flex flex-col">
 
-        <div class="h-40 w-full max-w-7xl mx-auto mb-6 flex justify-center overflow-hidden">
+        <div class="h-40 w-full max-w-7xl mx-auto mb-6 block text-center overflow-hidden">
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585118770961536"
                 crossorigin="anonymous"></script>
             <ins class="adsbygoogle"
