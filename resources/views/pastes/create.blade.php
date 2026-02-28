@@ -2,6 +2,33 @@
 
 @section('title', 'Create New Paste - SOFT Paste')
 
+@push('styles')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            border-radius: 0.75rem !important;
+            margin: 0 !important;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        }
+
+        /* Force Wrap overrides for Prism */
+        pre.whitespace-pre-wrap {
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+            padding-left: 1.5rem !important; /* Reset padding when line numbers are hidden */
+        }
+        code.whitespace-pre-wrap {
+            white-space: pre-wrap !important;
+            word-break: break-word !important;
+        }
+        /* Hide Prism line numbers when wrapped (physical lines != visual wraps) */
+        pre.whitespace-pre-wrap .line-numbers-rows {
+            display: none !important;
+        }
+    </style>
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto w-full bg-white dark:bg-slate-900 p-6 md:p-10 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mt-4 md:mt-8 transition-colors">
     <div class="mb-8">
@@ -35,8 +62,15 @@
                 if(this.$refs.lineNumbers) {
                     this.$refs.lineNumbers.scrollTop = e.target.scrollTop;
                 }
+            },
+            resize() {
+                if (!this.$refs.textarea) return;
+                this.$refs.textarea.style.height = 'auto';
+                this.$refs.textarea.style.height = this.$refs.textarea.scrollHeight + 'px';
             }
-        }">
+        }"
+        x-init="$nextTick(() => resize()); $watch('wrapText', () => $nextTick(() => resize()))">
+
             <div class="flex justify-between items-center mb-2 px-1">
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300">Content</label>
                 <button type="button" @click="wrapText = !wrapText"
@@ -58,9 +92,9 @@
                     </template>
                 </div>
 
-                <textarea name="content" x-model="content" rows="14"
-                    @scroll="syncScroll" @input="syncScroll"
-                    class="w-full bg-transparent p-5 font-mono text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500 leading-normal"
+                <textarea name="content" x-ref="textarea" x-model="content" rows="14"
+                    @scroll="syncScroll" @input="syncScroll; resize()"
+                    class="w-full bg-transparent p-5 font-mono text-sm text-slate-800 dark:text-slate-200 outline-none resize-none overflow-y-hidden placeholder:text-slate-400 dark:placeholder:text-slate-500 leading-normal"
                     :class="wrapText ? 'whitespace-pre-wrap' : 'whitespace-pre overflow-x-auto'"
                     placeholder="Paste your brilliant code or text here..." required></textarea>
             </div>
