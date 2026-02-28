@@ -137,7 +137,7 @@
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">User</th>
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Email</th>
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Role</th>
-                        <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Joined Date</th>
+                        <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Joined Time</th>
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -164,7 +164,7 @@
                                     <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-slate-200 dark:border-slate-700">User</span>
                                 @endif
                             </td>
-                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $user->created_at->format('M d, Y') }}</td>
+                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $user->created_at->format('M d, Y H:i') }}</td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end items-center gap-3">
                                     <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="confirmDelete(event, this, 'user');">
