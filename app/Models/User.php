@@ -14,6 +14,7 @@ class User extends Authenticatable
         'email',
         'google_id',
         'is_pro',
+        'is_admin',
         'avatar',
         'password'
     ];
@@ -21,5 +22,13 @@ class User extends Authenticatable
     public function pastes()
     {
         return $this->hasMany(Paste::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'is_admin' => 'boolean'
+        ];
     }
 }

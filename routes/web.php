@@ -6,6 +6,8 @@ use App\Http\Controllers\PasteController;
 use App\Http\Controllers\Auth\GoogleOneTapController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\AdminController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 
 Route::get('/test-redis', function () {
     // Check if the cache exists
@@ -18,6 +20,14 @@ Route::get('/test-redis', function () {
     Cache::put('browser_test', $message, 60);
 
     return "Saved to Redis. Refresh the page! Data: " . $message;
+});
+
+// -----------------------------------------------------------------------------
+// Admin Routes (MUST go above the wildcard)
+// -----------------------------------------------------------------------------
+Route::middleware(['auth', EnsureUserIsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::delete('/pastes/{slug}', [AdminController::class, 'destroy'])->name('pastes.destroy');
 });
 
 // -----------------------------------------------------------------------------

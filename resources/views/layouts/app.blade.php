@@ -64,6 +64,9 @@
             </button>
 
             @auth
+                @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.dashboard') }}" class="hidden md:block text-sm font-bold text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 transition mr-2">Admin Panel</a>
+                @endif
                 <a href="{{ route('dashboard') }}" class="hidden md:block text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">My Dashboard</a>
 
                 <div class="flex items-center gap-3 pl-4 border-l border-slate-200 dark:border-slate-700">
