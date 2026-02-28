@@ -39,6 +39,8 @@
 
     <style>
         body { font-family: 'Lexend Deca', sans-serif; }
+        [x-cloak] { display: none !important; } /* Prevents Alpine flash */
+
         /* Optional: Tweaks to make SweetAlert2 border-radius match your app */
         div:where(.swal2-container) div:where(.swal2-popup) {
             border-radius: 1rem;
@@ -226,17 +228,18 @@
     @stack('scripts')
 
     <script>
-        function confirmDelete(event, form) {
+        // Updated to accept itemName dynamically
+        function confirmDelete(event, form, itemName = 'paste') {
             event.preventDefault();
 
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Permanently delete this paste? This action cannot be undone!",
+                text: `Permanently delete this ${itemName}? This action cannot be undone!`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Yes, delete it!',
                 cancelButtonText: 'Cancel',
-                buttonsStyling: false, // Disables SweetAlert's default button styles
+                buttonsStyling: false,
                 customClass: {
                     popup: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none',
                     title: 'text-slate-800 dark:text-white font-bold text-xl',
