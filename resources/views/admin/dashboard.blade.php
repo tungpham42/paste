@@ -21,32 +21,19 @@
             {{ session('success') }}
         </div>
     @endif
-
     <div class="flex justify-end mb-4">
         <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <span class="font-medium">Show</span>
-
-            <div x-data="{ open: false }" @click.away="open = false" class="relative">
-                <button @click="open = !open" type="button" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer font-semibold shadow-sm min-w-[4rem] justify-between">
-                    <span>{{ $perPage }}</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute right-0 z-20 mt-1 w-full min-w-[4rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 text-sm text-center" style="display: none;">
-                    @foreach([5, 10, 20, 50, 100] as $value)
-                        <li>
-                            <a href="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}"
-                               class="block px-3 py-1.5 transition-colors {{ $perPage == $value ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400' }}">
-                                {{ $value }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-
+            <label for="per_page" class="font-medium">Show</label>
+            <select id="per_page" onchange="window.location.href=this.value" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                @foreach([5, 10, 20, 50, 100] as $value)
+                    <option value="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}" {{ $perPage == $value ? 'selected' : '' }}>
+                        {{ $value }}
+                    </option>
+                @endforeach
+            </select>
             <span class="font-medium">entries</span>
         </div>
     </div>
-
     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
         <table class="w-full text-left border-collapse">
             <thead>

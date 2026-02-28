@@ -39,67 +39,28 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-slate-50/50 dark:bg-slate-800/30 p-6 rounded-xl border border-slate-100 dark:border-slate-700/50">
-
-            <div x-data="{
-                open: false,
-                value: '{{ old('syntax', 'plaintext') }}',
-                options: {
-                    'plaintext': 'None (Plain Text)',
-                    'php': 'PHP',
-                    'javascript': 'JavaScript',
-                    'html': 'HTML',
-                    'css': 'CSS',
-                    'python': 'Python'
-                },
-                get selectedLabel() { return this.options[this.value]; }
-            }" @click.away="open = false" class="relative">
+            <div>
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Syntax</label>
-                <input type="hidden" name="syntax" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="(label, key) in options" :key="key">
-                        <li @click="value = key; open = false"
-                            class="px-4 py-2.5 cursor-pointer transition-colors"
-                            :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
-                            <span x-text="label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <select name="syntax" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm cursor-pointer transition">
+                    <option value="plaintext" {{ old('syntax') == 'plaintext' ? 'selected' : '' }}>None (Plain Text)</option>
+                    <option value="php" {{ old('syntax') == 'php' ? 'selected' : '' }}>PHP</option>
+                    <option value="javascript" {{ old('syntax') == 'javascript' ? 'selected' : '' }}>JavaScript</option>
+                    <option value="html" {{ old('syntax') == 'html' ? 'selected' : '' }}>HTML</option>
+                    <option value="css" {{ old('syntax') == 'css' ? 'selected' : '' }}>CSS</option>
+                    <option value="python" {{ old('syntax') == 'python' ? 'selected' : '' }}>Python</option>
+                </select>
             </div>
 
-            <div x-data="{
-                open: false,
-                value: '{{ old('visibility', 'public') }}',
-                options: [
-                    { id: 'public', label: '🌍 Public', disabled: false },
-                    { id: 'unlisted', label: '🔗 Unlisted', disabled: false },
-                    { id: 'private', label: '🔒 Private @if(!auth()->check()) (Login required) @endif', disabled: {{ !auth()->check() ? 'true' : 'false' }} }
-                ],
-                get selectedLabel() { return this.options.find(o => o.id === this.value).label; }
-            }" @click.away="open = false" class="relative">
+            <div>
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Visibility</label>
-                <input type="hidden" name="visibility" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm @error('visibility') border-rose-500 ring-4 ring-rose-500/20 @enderror">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="option in options" :key="option.id">
-                        <li @click="if(!option.disabled) { value = option.id; open = false }"
-                            class="px-4 py-2.5 transition-colors"
-                            :class="{
-                                'opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500': option.disabled,
-                                'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400': !option.disabled,
-                                'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold': value === option.id && !option.disabled,
-                                'text-slate-700 dark:text-slate-300': value !== option.id && !option.disabled
-                            }">
-                            <span x-text="option.label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <select name="visibility" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm cursor-pointer transition @error('visibility') border-rose-500 focus:ring-rose-500/20 @enderror">
+                    <option value="public" {{ old('visibility') == 'public' ? 'selected' : '' }}>🌍 Public</option>
+                    <option value="unlisted" {{ old('visibility') == 'unlisted' ? 'selected' : '' }}>🔗 Unlisted</option>
+                    <option value="private" {{ old('visibility') == 'private' ? 'selected' : '' }} @guest disabled @endguest>
+                        🔒 Private @if(!auth()->check()) (Login required) @endif
+                    </option>
+                </select>
+
                 @error('visibility')
                     <p class="text-rose-500 dark:text-rose-400 text-sm mt-2 font-medium flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -111,7 +72,7 @@
             <div>
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Password (Optional)</label>
                 <input type="password" name="password" placeholder="Keep it secret..."
-                    class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm @error('password') border-rose-500 focus:ring-rose-500/20 @enderror">
+                    class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition @error('password') border-rose-500 focus:ring-rose-500/20 @enderror">
 
                 @error('password')
                     <p class="text-rose-500 dark:text-rose-400 text-sm mt-2 font-medium flex items-center gap-1">
@@ -121,35 +82,16 @@
                 @enderror
             </div>
 
-            <div x-data="{
-                open: false,
-                value: '{{ old('expiration_minutes', '') }}',
-                options: {
-                    '': 'Never expire',
-                    '10': '10 Minutes',
-                    '60': '1 Hour',
-                    '1440': '1 Day',
-                    '10080': '1 Week'
-                },
-                get selectedLabel() { return this.options[this.value]; }
-            }" @click.away="open = false" class="relative">
+            <div>
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Expiration</label>
-                <input type="hidden" name="expiration_minutes" x-model="value">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
-                    <span x-text="selectedLabel"></span>
-                    <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms class="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
-                    <template x-for="(label, key) in options" :key="key">
-                        <li @click="value = key; open = false"
-                            class="px-4 py-2.5 cursor-pointer transition-colors"
-                            :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
-                            <span x-text="label"></span>
-                        </li>
-                    </template>
-                </ul>
+                <select name="expiration_minutes" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm cursor-pointer transition">
+                    <option value="" {{ old('expiration_minutes') == '' ? 'selected' : '' }}>Never expire</option>
+                    <option value="10" {{ old('expiration_minutes') == '10' ? 'selected' : '' }}>10 Minutes</option>
+                    <option value="60" {{ old('expiration_minutes') == '60' ? 'selected' : '' }}>1 Hour</option>
+                    <option value="1440" {{ old('expiration_minutes') == '1440' ? 'selected' : '' }}>1 Day</option>
+                    <option value="10080" {{ old('expiration_minutes') == '10080' ? 'selected' : '' }}>1 Week</option>
+                </select>
             </div>
-
         </div>
 
         <div class="mt-8 flex flex-col md:flex-row items-center justify-end gap-4">
