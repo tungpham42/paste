@@ -81,11 +81,11 @@
                         <td class="p-4 text-right">
                             <div class="flex justify-end items-center gap-3">
                                 <a target="_blank" href="{{ route('pastes.show', $paste) }}" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition">View</a>
-                                <form action="{{ route('admin.pastes.destroy', $paste) }}" method="POST" onsubmit="return confirm('ADMIN ACTION: Permanently delete this paste?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm font-medium text-rose-500 hover:text-rose-700 transition">Delete</button>
-                                </form>
+                                <button type="button"
+                                    @click="$dispatch('show-confirm', { action: '{{ route('admin.pastes.destroy', $paste) }}', message: 'ADMIN ACTION: Permanently delete this snippet?' })"
+                                    class="text-sm font-medium text-rose-500 hover:text-rose-700 transition">
+                                    Delete
+                                </button>
                             </div>
                         </td>
                     </tr>

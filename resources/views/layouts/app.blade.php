@@ -37,6 +37,8 @@
 
     <style>
         body { font-family: 'Lexend Deca', sans-serif; }
+        /* Prevent scroll when modal is open */
+        body.modal-open { overflow: hidden; }
     </style>
 
     @stack('styles')
@@ -50,9 +52,9 @@
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585118770961536" crossorigin="anonymous"></script>
 </head>
-<body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-900 dark:selection:text-indigo-200 flex flex-col min-h-screen transition-colors duration-200">
+<body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-900 dark:selection:text-indigo-200 flex flex-col min-h-screen transition-colors duration-200" x-data="{ isModalOpen: false }" :class="{ 'modal-open': isModalOpen }">
 
-    <nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-slate-100 dark:border-slate-800 px-6 py-4 transition-all">
+    <nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 shadow-sm border-b border-slate-100 dark:border-slate-800 px-6 py-4 transition-all">
         <div class="flex justify-between items-center">
             <div class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">
                 <a href="{{ route('pastes.create') }}">SOFT Paste</a>
@@ -198,7 +200,7 @@
                         window.location.href = data.redirect;
                     } else {
                         console.error('Login failed:', data.message);
-                        alert('Could not log in. Please try again.');
+                        window.dispatchEvent(new CustomEvent('show-alert', { detail: 'Could not log in. Please try again.' }));
                     }
                 })
                 .catch(error => console.error('Network Error:', error));
@@ -248,5 +250,71 @@
             setTimeout(closeToast, 4000);
         </script>
     @endif
+
+    <div x-data="{ show: false, message: '' }"
+         @show-alert.window="message = $event.detail; show = true; isModalOpen = true"
+         @keydown.escape.window="show = false; isModalOpen = false"
+         class="relative z-[100]"
+         aria-labelledby="modal-title" role="dialog" aria-modal="true"
+         x-show="show" style="display: none;">
+
+         <div x-show="show" x-transition.opacity class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+
+         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                 <div x-show="show" @click.away="show = false; isModalOpen = false" x-transition.opacity.scale.95 class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 border border-slate-200 dark:border-slate-800">
+                     <div class="mt-3 text-center sm:mt-5">
+                         <h3 class="text-lg font-bold leading-6 text-slate-800 dark:text-white" id="modal-title">Notification</h3>
+                         <div class="mt-2">
+                             <p class="text-sm text-slate-500 dark:text-slate-400" x-text="message"></p>
+                         </div>
+                     </div>
+                     <div class="mt-5 sm:mt-6">
+                         <button type="button" @click="show = false; isModalOpen = false" class="inline-flex w-full justify-center rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors">OK</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+
+    <div x-data="{ show: false, message: '', action: '' }"
+         @show-confirm.window="message = $event.detail.message; action = $event.detail.action; show = true; isModalOpen = true"
+         @keydown.escape.window="show = false; isModalOpen = false"
+         class="relative z-[100]"
+         aria-labelledby="confirm-modal-title" role="dialog" aria-modal="true"
+         x-show="show" style="display: none;">
+
+         <div x-show="show" x-transition.opacity class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+
+         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                 <div x-show="show" @click.away="show = false; isModalOpen = false" x-transition.opacity.scale.95 class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-200 dark:border-slate-800">
+                     <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                         <div class="sm:flex sm:items-start">
+                             <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/10 sm:mx-0 sm:h-10 sm:w-10">
+                                 <svg class="h-6 w-6 text-rose-600 dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                 </svg>
+                             </div>
+                             <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                 <h3 class="text-lg font-bold leading-6 text-slate-800 dark:text-white" id="confirm-modal-title">Confirm Action</h3>
+                                 <div class="mt-2">
+                                     <p class="text-sm text-slate-500 dark:text-slate-400 font-medium" x-text="message"></p>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
+                         <form :action="action" method="POST" class="m-0 sm:ml-3">
+                             @csrf
+                             @method('DELETE')
+                             <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-rose-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-500 sm:w-auto transition-colors">Confirm Delete</button>
+                         </form>
+                         <button type="button" @click="show = false; isModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-slate-300 shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 sm:mt-0 sm:w-auto transition-colors">Cancel</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
 </body>
 </html>
