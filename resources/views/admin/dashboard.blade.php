@@ -21,7 +21,19 @@
             {{ session('success') }}
         </div>
     @endif
-
+    <div class="flex justify-end mb-4">
+        <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <label for="per_page" class="font-medium">Show</label>
+            <select id="per_page" onchange="window.location.href=this.value" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                @foreach([5, 10, 20, 50, 100] as $value)
+                    <option value="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}" {{ $perPage == $value ? 'selected' : '' }}>
+                        {{ $value }}
+                    </option>
+                @endforeach
+            </select>
+            <span class="font-medium">entries</span>
+        </div>
+    </div>
     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
         <table class="w-full text-left border-collapse">
             <thead>
