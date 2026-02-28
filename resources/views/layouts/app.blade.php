@@ -186,6 +186,24 @@
         @yield('content')
     </main>
 
+    <button
+        x-data="{ show: false }"
+        @scroll.window="show = window.pageYOffset > 200"
+        @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-4"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 translate-y-4"
+        class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/30 dark:shadow-indigo-900/40 transition-colors focus:outline-none focus:ring-4 focus:ring-indigo-500/20 group"
+        aria-label="Back to top"
+        style="display: none;"
+    >
+        <svg class="w-5 h-5 transform group-hover:-translate-y-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
     <script>
         var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
@@ -312,7 +330,7 @@
     @endguest
 
     @if (session('status') || session('success'))
-        <div id="toast-alert" class="fixed bottom-6 right-6 z-50 flex items-center w-full max-w-sm p-4 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 transition-all duration-500 transform translate-y-0 opacity-100" role="alert">
+        <div id="toast-alert" class="fixed bottom-24 md:bottom-28 right-6 z-50 flex items-center w-full max-w-sm p-4 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 transition-all duration-500 transform translate-y-0 opacity-100" role="alert">
             <div class="inline-flex items-center justify-center flex-shrink-0 w-10 h-10 text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl border border-emerald-100 dark:border-emerald-500/20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
