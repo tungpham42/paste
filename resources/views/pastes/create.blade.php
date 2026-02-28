@@ -53,11 +53,20 @@
 
             <div>
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300 mb-2">Visibility</label>
-                <select name="visibility" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm cursor-pointer transition">
+                <select name="visibility" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 p-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm cursor-pointer transition @error('visibility') border-rose-500 focus:ring-rose-500/20 @enderror">
                     <option value="public" {{ old('visibility') == 'public' ? 'selected' : '' }}>🌍 Public</option>
                     <option value="unlisted" {{ old('visibility') == 'unlisted' ? 'selected' : '' }}>🔗 Unlisted</option>
-                    <option value="private" {{ old('visibility') == 'private' ? 'selected' : '' }}>🔒 Private</option>
+                    <option value="private" {{ old('visibility') == 'private' ? 'selected' : '' }} @guest disabled @endguest>
+                        🔒 Private @if(!auth()->check()) (Login required) @endif
+                    </option>
                 </select>
+
+                @error('visibility')
+                    <p class="text-rose-500 dark:text-rose-400 text-sm mt-2 font-medium flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {{ $message }}
+                    </p>
+                @enderror
             </div>
 
             <div>

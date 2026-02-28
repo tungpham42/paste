@@ -26,7 +26,15 @@ class PasteController extends Controller
             'title' => 'nullable|string|max:255',
             'content' => 'required|string|max:524288', // 512KB limit
             'syntax' => 'required|string',
-            'visibility' => 'required|in:public,unlisted,private',
+            'visibility' => [
+                'required',
+                'in:public,unlisted,private',
+                function ($attribute, $value, $fail) {
+                    if ($value === 'private' && !auth()->check()) {
+                        $fail('You must be logged in to create a private paste.');
+                    }
+                },
+            ],
             'password' => 'nullable|string|min:4',
             'expiration_minutes' => 'nullable|integer'
         ]);
