@@ -95,8 +95,29 @@
         function copyCode() {
             const codeBlock = document.getElementById('code-block').innerText;
             navigator.clipboard.writeText(codeBlock).then(() => {
-                alert('✨ Code copied to clipboard!');
-            }).catch(err => console.error('Failed to copy text: ', err));
+                const isDark = document.documentElement.classList.contains('dark');
+
+                // REPLACED ALERT WITH SWEETALERT TOAST
+                Swal.fire({
+                    toast: true,
+                    position: 'bottom-end',
+                    icon: 'success',
+                    title: '✨ Code copied to clipboard!',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: isDark ? '#1e293b' : '#ffffff',
+                    color: isDark ? '#f8fafc' : '#0f172a',
+                    iconColor: '#10b981' // Tailwind emerald-500
+                });
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to copy text to clipboard.',
+                });
+            });
         }
     </script>
 @endpush

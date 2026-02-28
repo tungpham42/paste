@@ -35,8 +35,14 @@
         }
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body { font-family: 'Lexend Deca', sans-serif; }
+        /* Optional: Tweaks to make SweetAlert2 border-radius match your app */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            border-radius: 1rem;
+        }
     </style>
 
     @stack('styles')
@@ -179,6 +185,34 @@
 
     @stack('scripts')
 
+    <script>
+        function confirmDelete(event, form) {
+            event.preventDefault();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Permanently delete this paste? This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                buttonsStyling: false, // Disables SweetAlert's default button styles
+                customClass: {
+                    popup: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none',
+                    title: 'text-slate-800 dark:text-white font-bold text-xl',
+                    htmlContainer: 'text-slate-500 dark:text-slate-400 text-sm mt-2',
+                    actions: 'gap-3 w-full px-6 pb-6',
+                    confirmButton: 'flex-1 justify-center flex items-center bg-rose-500 hover:bg-rose-600 text-white px-4 py-2.5 rounded-xl transition-all font-semibold shadow-sm',
+                    cancelButton: 'flex-1 justify-center flex items-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-transparent dark:border-slate-700 px-4 py-2.5 rounded-xl transition-all font-semibold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
+
     @guest
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
@@ -198,7 +232,18 @@
                         window.location.href = data.redirect;
                     } else {
                         console.error('Login failed:', data.message);
-                        alert('Could not log in. Please try again.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Login Failed',
+                            text: 'Could not log in. Please try again.',
+                            buttonsStyling: false,
+                            customClass: {
+                                popup: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl',
+                                title: 'text-slate-800 dark:text-white font-bold',
+                                htmlContainer: 'text-slate-500 dark:text-slate-400 mt-2 text-sm',
+                                confirmButton: 'w-full justify-center flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl transition-all font-semibold shadow-sm mt-4'
+                            }
+                        });
                     }
                 })
                 .catch(error => console.error('Network Error:', error));
