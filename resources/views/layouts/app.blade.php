@@ -96,7 +96,6 @@
       gtag("js", new Date());
       gtag("config", "G-HHXZSNQ65X");
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3585118770961536" crossorigin="anonymous"></script>
 </head>
 <body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-900 dark:selection:text-indigo-200 flex flex-col min-h-screen transition-colors duration-200">
 
