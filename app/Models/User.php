@@ -24,6 +24,14 @@ class User extends Authenticatable
         return $this->hasMany(Paste::class);
     }
 
+    /**
+     * Check if the user is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
+
     protected function casts(): array
     {
         return [

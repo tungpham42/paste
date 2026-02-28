@@ -28,6 +28,9 @@ Route::get('/test-redis', function () {
 Route::middleware(['auth', EnsureUserIsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::delete('/pastes/{slug}', [AdminController::class, 'destroy'])->name('pastes.destroy');
+
+    // New route for deleting users from the admin dashboard
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 });
 
 // -----------------------------------------------------------------------------
@@ -44,6 +47,12 @@ Route::post('/pastes', [PasteController::class, 'store'])->name('pastes.store');
 Route::post('/pastes/{paste}/unlock', [PasteController::class, 'unlock'])->name('pastes.unlock.store');
 
 // -----------------------------------------------------------------------------
+// Authentication Routes
+// -----------------------------------------------------------------------------
+Route::post('/auth/google/verify', [GoogleOneTapController::class, 'verify'])->name('auth.google.verify');
+Route::view('/login', 'login')->name('login')->middleware('guest');
+
+// -----------------------------------------------------------------------------
 // Authenticated Routes
 // -----------------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
@@ -51,13 +60,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pastes/{slug}', [PasteController::class, 'destroy'])->name('pastes.destroy');
     Route::post('/logout', [GoogleOneTapController::class, 'logout'])->name('logout');
 });
-
-// -----------------------------------------------------------------------------
-// Wildcard Route (Must go LAST)
-// -----------------------------------------------------------------------------
-
-Route::post('/auth/google/verify', [GoogleOneTapController::class, 'verify'])->name('auth.google.verify');
-Route::view('/login', 'login')->name('login')->middleware('guest');
 
 // -----------------------------------------------------------------------------
 // Sitemap Route (MUST go above the wildcard)

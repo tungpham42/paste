@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paste;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -19,13 +20,21 @@ class AdminController extends Controller
         }
 
         // Fetch all pastes, globally ignoring the active scope to see expired ones
+        // Added 'pastes_page' to prevent pagination conflicts with the users tab
         $pastes = Paste::withoutGlobalScopes()
             ->with('user')
             ->latest()
-            ->paginate($perPage)
-            ->appends($request->query()); // Keeps the ?per_page parameter on page 2, 3, etc.
+            ->paginate($perPage, ['*'], 'pastes_page')
+            ->appends($request->query());
 
-        return view('admin.dashboard', compact('pastes', 'perPage'));
+        // Fetch all users for the new Admin Dashboard tab
+        // Added 'users_page' to prevent pagination conflicts with the pastes tab
+        $users = User::latest()
+            ->paginate($perPage, ['*'], 'users_page')
+            ->appends($request->query());
+
+        // Pass both variables to the view
+        return view('admin.dashboard', compact('pastes', 'users', 'perPage'));
     }
 
     public function destroy($slug)
@@ -35,5 +44,17 @@ class AdminController extends Controller
         $paste->delete();
 
         return redirect()->route('admin.dashboard')->with('success', 'Paste permanently deleted by Admin.');
+    }
+
+    public function destroyUser(User $user)
+    {
+        // Prevent admins from deleting themselves
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User permanently deleted from the platform.');
     }
 }
