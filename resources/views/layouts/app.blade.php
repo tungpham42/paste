@@ -34,7 +34,7 @@
             darkMode: 'class',
         }
     </script>
-
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -42,6 +42,46 @@
         /* Optional: Tweaks to make SweetAlert2 border-radius match your app */
         div:where(.swal2-container) div:where(.swal2-popup) {
             border-radius: 1rem;
+        }
+
+        /* Firefox Scrollbar */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f8fafc; /* slate-300 thumb, slate-50 track */
+        }
+        html.dark {
+            scrollbar-color: #334155 #0f172a; /* slate-700 thumb, slate-950 track */
+        }
+
+        /* Webkit Scrollbar (Chrome, Edge, Safari) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f8fafc; /* slate-50 */
+        }
+        html.dark ::-webkit-scrollbar-track {
+            background: #0f172a; /* slate-950 */
+        }
+
+        /* Thumb */
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* slate-400 */
+        }
+
+        /* Dark Mode Thumb */
+        html.dark ::-webkit-scrollbar-thumb {
+            background: #334155; /* slate-700 */
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569; /* slate-600 */
         }
     </style>
 
