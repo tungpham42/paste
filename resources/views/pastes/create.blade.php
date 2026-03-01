@@ -55,6 +55,7 @@
         <div class="mb-6" x-data="{
             content: @js(old('content', '')),
             wrapText: false,
+            indentSize: '4', // Default to 4 spaces
             get lineCount() {
                 return this.content.split('\n').length || 1;
             },
@@ -67,18 +68,47 @@
                 if (!this.$refs.textarea) return;
                 this.$refs.textarea.style.height = 'auto';
                 this.$refs.textarea.style.height = this.$refs.textarea.scrollHeight + 'px';
+            },
+            insertTab(e) {
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+
+                // Determine what string to insert based on user selection
+                const tabCharacter = this.indentSize === 'tab' ? '\t' : ' '.repeat(parseInt(this.indentSize));
+
+                // Insert the tab character at the cursor's current position
+                this.content = this.content.substring(0, start) + tabCharacter + this.content.substring(end);
+
+                // Wait for Alpine to update the DOM, then restore the cursor position
+                $nextTick(() => {
+                    e.target.selectionStart = e.target.selectionEnd = start + tabCharacter.length;
+                    this.resize();
+                });
             }
         }"
         x-init="$nextTick(() => resize()); $watch('wrapText', () => $nextTick(() => resize()))">
 
             <div class="flex justify-between items-center mb-2 px-1">
                 <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300">Content</label>
-                <button type="button" @click="wrapText = !wrapText"
-                        class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
-                        :class="wrapText ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                    <span x-text="wrapText ? 'Unwrap Text' : 'Wrap Text'"></span>
-                </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Indent:</span>
+                        <select x-model="indentSize" class="text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-none rounded-md py-1.5 pl-2 pr-6 focus:ring-0 cursor-pointer outline-none transition-colors appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem top 50%; background-size: 0.5rem auto;">
+                            <option value="2">2 spaces</option>
+                            <option value="4">4 spaces</option>
+                            <option value="8">8 spaces</option>
+                            <option value="tab">Tab (\t)</option>
+                        </select>
+                    </div>
+
+                    <button type="button" @click="wrapText = !wrapText"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
+                            :class="wrapText ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                        <span x-text="wrapText ? 'Unwrap Text' : 'Wrap Text'"></span>
+                    </button>
+                </div>
             </div>
 
             <div class="relative flex w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden focus-within:ring-4 focus-within:ring-indigo-500/20 focus-within:border-indigo-500 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all @error('content') border-rose-500 focus-within:ring-rose-500/20 @enderror">
@@ -93,6 +123,7 @@
                 </div>
 
                 <textarea name="content" x-ref="textarea" x-model="content" rows="14"
+                    @keydown.tab.prevent="insertTab($event)"
                     @scroll="syncScroll" @input="syncScroll; resize()"
                     class="w-full bg-transparent p-5 font-mono text-sm text-slate-800 dark:text-slate-200 outline-none resize-none overflow-y-hidden placeholder:text-slate-400 dark:placeholder:text-slate-500 leading-normal"
                     :class="wrapText ? 'whitespace-pre-wrap' : 'whitespace-pre overflow-x-auto'"
