@@ -29,6 +29,16 @@
     </style>
 @endpush
 
+@push('scripts')
+    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-html.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-postcss.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-markdown.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-yaml.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-graphql.js"></script>
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto w-full bg-white dark:bg-slate-900 p-6 md:p-10 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 mt-4 md:mt-8 transition-colors">
     <div class="mb-8">
@@ -56,6 +66,7 @@
             content: @js(old('content', '')),
             wrapText: false,
             indentSize: '4', // Default to 4 spaces
+            isFormatting: false,
             get lineCount() {
                 return this.content.split('\n').length || 1;
             },
@@ -72,29 +83,81 @@
             insertTab(e) {
                 const start = e.target.selectionStart;
                 const end = e.target.selectionEnd;
-
-                // Determine what string to insert based on user selection
                 const tabCharacter = this.indentSize === 'tab' ? '\t' : ' '.repeat(parseInt(this.indentSize));
-
-                // Insert the tab character at the cursor's current position
                 this.content = this.content.substring(0, start) + tabCharacter + this.content.substring(end);
-
-                // Wait for Alpine to update the DOM, then restore the cursor position
                 $nextTick(() => {
                     e.target.selectionStart = e.target.selectionEnd = start + tabCharacter.length;
                     this.resize();
                 });
+            },
+            formatCode() {
+                if (!this.content || this.content.trim() === '') return;
+                this.isFormatting = true;
+
+                setTimeout(() => {
+                    try {
+                        const syntax = document.querySelector('input[name=&quot;syntax&quot;]').value;
+
+                        // Map syntaxes to Prettier parsers
+                        const parserMap = {
+                            'javascript': 'babel',
+                            'typescript': 'babel-ts',
+                            'json': 'json',
+                            'html': 'html',
+                            'xml': 'html',
+                            'css': 'css',
+                            'scss': 'scss',
+                            'less': 'less',
+                            'markdown': 'markdown',
+                            'yaml': 'yaml',
+                            'graphql': 'graphql'
+                        };
+
+                        const parser = parserMap[syntax];
+
+                        if (parser && typeof prettier !== 'undefined') {
+                            // Full Prettier Formatting
+                            this.content = prettier.format(this.content, {
+                                parser: parser,
+                                plugins: prettierPlugins,
+                                tabWidth: parseInt(this.indentSize === 'tab' ? 4 : this.indentSize),
+                                useTabs: this.indentSize === 'tab'
+                            });
+
+                            Swal.fire({
+                                toast: true, position: 'bottom-end', icon: 'success',
+                                title: 'Code formatted!', showConfirmButton: false, timer: 2000
+                            });
+                        } else {
+                            // Basic Fallback Cleanup for C++, Python, Bash, etc.
+                            this.content = this.content.split('\n').map(line => line.trimEnd()).join('\n');
+
+                            Swal.fire({
+                                toast: true, position: 'bottom-end', icon: 'info',
+                                title: `Basic cleanup applied. Full formatting isn't supported for ${syntax.toUpperCase()} in the browser.`,
+                                showConfirmButton: false, timer: 4000
+                            });
+                        }
+
+                        this.$nextTick(() => this.resize());
+                    } catch (err) {
+                        console.error('Format error:', err);
+                        Swal.fire({
+                            toast: true, position: 'bottom-end', icon: 'error',
+                            title: 'Syntax error: Could not format code.',
+                            showConfirmButton: false, timer: 3000
+                        });
+                    } finally {
+                        this.isFormatting = false;
+                    }
+                }, 100);
             }
         }"
         x-init="$nextTick(() => resize()); $watch('wrapText', () => $nextTick(() => resize()))">
 
-            <div class="flex justify-between items-center mb-2 px-1">
-                <label class="block font-semibold text-sm text-slate-700 dark:text-slate-300">Content</label>
-
+            <div class="flex justify-end items-center mb-2 px-1">
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1.5">
-                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Indent:</span>
-
                         <div x-data="{
                             open: false,
                             dropUp: false,
@@ -133,13 +196,20 @@
                                 </template>
                             </ul>
                         </div>
-                        </div>
+                    </div>
+
+                    <button type="button" @click="formatCode" :disabled="isFormatting"
+                            class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg x-show="!isFormatting" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        <svg x-show="isFormatting" class="w-3.5 h-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display: none;"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="isFormatting ? 'Formatting...' : 'Prettify'"></span>
+                    </button>
 
                     <button type="button" @click="wrapText = !wrapText"
                             class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
                             :class="wrapText ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-                        <span x-text="wrapText ? 'Unwrap Text' : 'Wrap Text'"></span>
+                        <span x-text="wrapText ? 'Unwrap' : 'Wrap'"></span>
                     </button>
                 </div>
             </div>
