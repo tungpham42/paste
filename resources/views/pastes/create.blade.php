@@ -95,6 +95,16 @@
                 this.isFormatting = true;
 
                 setTimeout(() => {
+                    // Check if dark mode is active
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const swalTheme = {
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        background: isDark ? '#1e293b' : '#ffffff',
+                        color: isDark ? '#f8fafc' : '#0f172a'
+                    };
+
                     try {
                         const syntax = document.querySelector('input[name=&quot;syntax&quot;]').value;
 
@@ -125,17 +135,21 @@
                             });
 
                             Swal.fire({
-                                toast: true, position: 'bottom-end', icon: 'success',
-                                title: 'Code formatted!', showConfirmButton: false, timer: 2000
+                                ...swalTheme,
+                                icon: 'success',
+                                iconColor: '#10b981',
+                                title: 'Code formatted!',
+                                timer: 2000
                             });
                         } else {
                             // Basic Fallback Cleanup for C++, Python, Bash, etc.
                             this.content = this.content.split('\n').map(line => line.trimEnd()).join('\n');
 
                             Swal.fire({
-                                toast: true, position: 'bottom-end', icon: 'info',
+                                ...swalTheme,
+                                icon: 'info',
                                 title: `Basic cleanup applied. Full formatting isn't supported for ${syntax.toUpperCase()} in the browser.`,
-                                showConfirmButton: false, timer: 4000
+                                timer: 4000
                             });
                         }
 
@@ -143,9 +157,10 @@
                     } catch (err) {
                         console.error('Format error:', err);
                         Swal.fire({
-                            toast: true, position: 'bottom-end', icon: 'error',
+                            ...swalTheme,
+                            icon: 'error',
                             title: 'Syntax error: Could not format code.',
-                            showConfirmButton: false, timer: 3000
+                            timer: 3000
                         });
                     } finally {
                         this.isFormatting = false;
