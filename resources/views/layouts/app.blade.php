@@ -85,12 +85,6 @@
         html.dark ::-webkit-scrollbar-thumb:hover {
             background: #475569; /* slate-600 */
         }
-        /* Hide default cursor on desktop where custom cursor is active */
-        @media (pointer: fine) {
-            body, a, button, input, textarea, select {
-                cursor: none !important;
-            }
-        }
     </style>
 
     @stack('styles')
@@ -104,8 +98,7 @@
     </script>
 </head>
 <body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-800 dark:text-slate-200 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-900 dark:selection:text-indigo-200 flex flex-col min-h-screen transition-colors duration-200">
-    <div id="custom-cursor" class="fixed top-0 left-0 w-3 h-3 rounded-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none z-[9999] transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-out hidden md:block"></div>
-    <div id="custom-cursor-follower" class="fixed top-0 left-0 w-10 h-10 rounded-full border-2 border-indigo-600 dark:border-indigo-400 pointer-events-none z-[9998] transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-out hidden md:block"></div>
+
     <nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-slate-100 dark:border-slate-800 px-6 py-4 transition-all">
         <div class="flex justify-between items-center">
             <div class="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">
@@ -420,50 +413,6 @@
                     });
                 }
             }, 2000); // 2000ms delay prevents false positives on slow connections
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Only initialize the custom cursor on devices with a precise pointer (e.g., desktops)
-            if (window.matchMedia("(pointer: fine)").matches) {
-                const cursor = document.getElementById('custom-cursor');
-                const follower = document.getElementById('custom-cursor-follower');
-
-                // Update positions on mouse move
-                window.addEventListener('mousemove', (e) => {
-                    const { clientX, clientY } = e;
-
-                    // The inner dot follows instantly
-                    cursor.style.left = `${clientX}px`;
-                    cursor.style.top = `${clientY}px`;
-
-                    // The outer circle has a smooth CSS transition creating a trailing effect
-                    follower.style.left = `${clientX}px`;
-                    follower.style.top = `${clientY}px`;
-                });
-
-                // Add interactive hover states for links and buttons
-                const interactables = document.querySelectorAll('a, button, input, textarea, select, [role="button"]');
-
-                interactables.forEach(el => {
-                    el.addEventListener('mouseenter', () => {
-                        // Expand the outer circle and add a subtle indigo background
-                        follower.classList.add('scale-150', 'bg-indigo-600/10', 'dark:bg-indigo-400/10');
-                        // Shrink the inner dot
-                        cursor.classList.add('scale-50');
-                    });
-
-                    el.addEventListener('mouseleave', () => {
-                        // Revert to default states
-                        follower.classList.remove('scale-150', 'bg-indigo-600/10', 'dark:bg-indigo-400/10');
-                        cursor.classList.remove('scale-50');
-                    });
-                });
-            } else {
-                // Ensure the DOM elements stay completely hidden on touch devices
-                document.getElementById('custom-cursor').style.display = 'none';
-                document.getElementById('custom-cursor-follower').style.display = 'none';
-            }
         });
     </script>
 </body>
