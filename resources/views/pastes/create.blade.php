@@ -98,7 +98,7 @@
                             <option value="2">2 spaces</option>
                             <option value="4">4 spaces</option>
                             <option value="8">8 spaces</option>
-                            <option value="tab">Tab (\t)</option>
+                            <option value="tab">Tab</option>
                         </select>
                     </div>
 
