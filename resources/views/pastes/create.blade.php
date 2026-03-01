@@ -340,7 +340,7 @@
                 options: [
                     { id: 'public', label: '🌍 Public', disabled: false },
                     { id: 'unlisted', label: '🔗 Unlisted', disabled: false },
-                    { id: 'private', label: '🔒 Private @if(!auth()->check()) (Login required) @endif', disabled: {{ !auth()->check() ? 'true' : 'false' }} }
+                    { id: 'private', label: '🔒 Private', disabled: {{ !auth()->check() ? 'true' : 'false' }} }
                 ],
                 get selectedLabel() { return this.options.find(o => o.id === this.value).label; },
                 reposition() {
