@@ -69,5 +69,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 // -----------------------------------------------------------------------------
 // Wildcard Route (Must go LAST)
 // -----------------------------------------------------------------------------
+Route::get('/{paste}/raw', [PasteController::class, 'raw'])->name('pastes.raw');
+Route::get('/{paste}/download', [PasteController::class, 'download'])->name('pastes.download');
+
 // This allows short, clean URLs like: softpaste.com/aB8x9Z
 Route::get('/{paste}', [PasteController::class, 'show'])->name('pastes.show');

@@ -120,4 +120,55 @@ class PasteController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Your snippet has been deleted successfully.');
     }
+
+    /**
+     * Display the raw content of the paste.
+     */
+    public function raw(Request $request, Paste $paste)
+    {
+        if (!$this->checkAccess($request, $paste)) {
+            return redirect()->route('pastes.show', $paste);
+        }
+
+        return response($paste->content, 200)
+            ->header('Content-Type', 'text/plain');
+    }
+
+    /**
+     * Download the paste as a file.
+     */
+    public function download(Request $request, Paste $paste)
+    {
+        if (!$this->checkAccess($request, $paste)) {
+            return redirect()->route('pastes.show', $paste);
+        }
+
+        // Determine file extension (fallback to .txt)
+        $extension = $paste->syntax === 'plaintext' ? 'txt' : $paste->syntax;
+
+        // Generate a safe filename
+        $filename = Str::slug($paste->title ?: $paste->slug) . '.' . $extension;
+
+        return response()->streamDownload(function () use ($paste) {
+            echo $paste->content;
+        }, $filename);
+    }
+
+    /**
+     * Helper to verify privacy and password protection for raw/download endpoints.
+     */
+    private function checkAccess(Request $request, Paste $paste)
+    {
+        // 1. Check Privacy
+        if ($paste->visibility === 'private' && $paste->user_id !== auth()->id()) {
+            abort(403, 'This snippet is private and you do not have permission to view it.');
+        }
+
+        // 2. Check Password Protection
+        if ($paste->password && !$request->session()->has("unlocked_paste_{$paste->id}")) {
+            return false; // Indicates they need to be redirected to the unlock screen
+        }
+
+        return true;
+    }
 }
