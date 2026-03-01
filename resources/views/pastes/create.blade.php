@@ -94,13 +94,46 @@
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-1.5">
                         <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Indent:</span>
-                        <select x-model="indentSize" class="text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border-none rounded-md py-1.5 pl-2 pr-6 focus:ring-0 cursor-pointer outline-none transition-colors appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.5rem top 50%; background-size: 0.5rem auto;">
-                            <option value="2">2 spaces</option>
-                            <option value="4">4 spaces</option>
-                            <option value="8">8 spaces</option>
-                            <option value="tab">Tab</option>
-                        </select>
-                    </div>
+
+                        <div x-data="{
+                            open: false,
+                            dropUp: false,
+                            options: {
+                                '2': '2 spaces',
+                                '4': '4 spaces',
+                                '8': '8 spaces',
+                                'tab': 'Tab'
+                            },
+                            get selectedLabel() { return this.options[indentSize]; },
+                            reposition() {
+                                if (!this.$refs.button) return;
+                                const rect = this.$refs.button.getBoundingClientRect();
+                                const spaceBelow = window.innerHeight - rect.bottom;
+                                this.dropUp = spaceBelow < 200 && rect.top > spaceBelow;
+                            }
+                        }"
+                        @click.away="open = false"
+                        @scroll.window="open ? reposition() : null"
+                        @resize.window="open ? reposition() : null"
+                        class="relative">
+                            <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button"
+                                    class="flex items-center justify-between min-w-[5.5rem] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-md py-1.5 px-2.5 focus:ring-0 cursor-pointer outline-none transition-colors text-xs font-semibold">
+                                <span x-text="selectedLabel"></span>
+                                <svg class="w-3.5 h-3.5 ml-1.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            <ul x-show="open" x-transition.opacity.duration.200ms
+                                :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
+                                class="absolute right-0 z-50 w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl py-1 text-xs" style="display: none;">
+                                <template x-for="(label, key) in options" :key="key">
+                                    <li @click="indentSize = key; open = false"
+                                        class="px-3 py-2 cursor-pointer transition-colors"
+                                        :class="indentSize === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
+                                        <span x-text="label"></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        </div>
 
                     <button type="button" @click="wrapText = !wrapText"
                             class="text-xs font-semibold px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors"
