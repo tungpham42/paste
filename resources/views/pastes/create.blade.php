@@ -403,11 +403,15 @@
                 dropUp: false,
                 value: '{{ old('expiration_minutes', '') }}',
                 options: {
-                    '': 'Never expire',
+                    '': 'Never',
                     '10': '10 Minutes',
                     '60': '1 Hour',
                     '1440': '1 Day',
-                    '10080': '1 Week'
+                    '10080': '1 Week',
+                    '20160': '2 Weeks',
+                    '43200': '1 Month',
+                    '259200': '6 Months',
+                    '525600': '1 Year'
                 },
                 get selectedLabel() { return this.options[this.value]; },
                 reposition() {
