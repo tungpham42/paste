@@ -24,6 +24,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 px-5 py-4 rounded-xl mb-6 flex items-center gap-3 font-medium">
+            <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="flex space-x-6 mb-6 border-b border-slate-200 dark:border-slate-800">
         <button @click="activeTab = 'pastes'"
                 :class="activeTab === 'pastes' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'"
@@ -39,57 +46,64 @@
         </button>
     </div>
 
-    <div x-show="activeTab === 'pastes'" x-cloak>
-        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 mt-2">
-            <form method="GET" action="{{ route('admin.dashboard') }}" class="w-full md:w-1/3 relative">
-                @if(request('per_page'))
-                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
-                @endif
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <form method="GET" action="{{ route('admin.dashboard') }}" class="w-full md:w-1/3 relative flex gap-2">
+            @if(request('per_page'))
+                <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+            @endif
+            <div class="relative w-full">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5 transition-colors" placeholder="Search users or snippets...">
-            </form>
-
-            <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                <span class="font-medium">Show</span>
-
-                <div x-data="{
-                    open: false,
-                    dropUp: false,
-                    reposition() {
-                        if (!this.$refs.button) return;
-                        const rect = this.$refs.button.getBoundingClientRect();
-                        const spaceBelow = window.innerHeight - rect.bottom;
-                        this.dropUp = spaceBelow < 180 && rect.top > spaceBelow;
-                    }
-                }"
-                @click.away="open = false"
-                @scroll.window="open ? reposition() : null"
-                @resize.window="open ? reposition() : null"
-                class="relative">
-                    <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer font-semibold shadow-sm min-w-[4rem] justify-between">
-                        <span>{{ $perPage ?? 10 }}</span>
-                        <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </button>
-                    <ul x-show="open" x-transition.opacity.duration.200ms
-                        :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
-                        class="absolute right-0 z-50 w-full min-w-[4rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 text-sm text-center" style="display: none;">
-                        @foreach([5, 10, 20, 50, 100] as $value)
-                            <li>
-                                <a href="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}"
-                                class="block px-3 py-1.5 transition-colors {{ ($perPage ?? 10) == $value ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400' }}">
-                                    {{ $value }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <span class="font-medium">entries</span>
             </div>
-        </div>
+            @if(request('search'))
+                <a href="{{ route('admin.dashboard', ['per_page' => request('per_page')]) }}" class="flex items-center justify-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium border border-slate-200 dark:border-slate-700" title="Clear Search">
+                    Clear
+                </a>
+            @endif
+        </form>
 
+        <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <span class="font-medium">Show</span>
+
+            <div x-data="{
+                open: false,
+                dropUp: false,
+                reposition() {
+                    if (!this.$refs.button) return;
+                    const rect = this.$refs.button.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    this.dropUp = spaceBelow < 180 && rect.top > spaceBelow;
+                }
+            }"
+            @click.away="open = false"
+            @scroll.window="open ? reposition() : null"
+            @resize.window="open ? reposition() : null"
+            class="relative">
+                <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer font-semibold shadow-sm min-w-[4rem] justify-between">
+                    <span>{{ $perPage ?? 10 }}</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <ul x-show="open" x-transition.opacity.duration.200ms
+                    :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
+                    class="absolute right-0 z-50 w-full min-w-[4rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 text-sm text-center" style="display: none;">
+                    @foreach([5, 10, 20, 50, 100] as $value)
+                        <li>
+                            <a href="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}"
+                            class="block px-3 py-1.5 transition-colors {{ ($perPage ?? 10) == $value ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400' }}">
+                                {{ $value }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <span class="font-medium">entries</span>
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'pastes'" x-cloak>
         <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -142,7 +156,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="p-12 text-center text-slate-500">No pastes exist on the platform yet.</td>
+                            <td colspan="7" class="p-12 text-center text-slate-500">
+                                @if(request('search'))
+                                    No pastes found matching "{{ request('search') }}".
+                                @else
+                                    No pastes exist on the platform yet.
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -155,7 +175,7 @@
     </div>
 
     <div x-show="activeTab === 'users'" x-cloak>
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 mt-4">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
@@ -202,7 +222,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-12 text-center text-slate-500">No users found on the platform.</td>
+                            <td colspan="6" class="p-12 text-center text-slate-500">
+                                @if(request('search'))
+                                    No users found matching "{{ request('search') }}".
+                                @else
+                                    No users found on the platform.
+                                @endif
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
