@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-4">
         <table id="pastesTable" class="w-full text-left border-collapse stripe hover">
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">

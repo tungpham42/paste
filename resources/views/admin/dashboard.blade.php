@@ -47,7 +47,7 @@
     </div>
 
     <div x-show="activeTab === 'pastes'" x-cloak>
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-4">
             <table id="adminPastesTable" class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
@@ -106,7 +106,7 @@
     </div>
 
     <div x-show="activeTab === 'users'" x-cloak>
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-4">
             <table id="adminUsersTable" class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
