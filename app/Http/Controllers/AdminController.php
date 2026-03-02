@@ -10,36 +10,47 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        // Define allowed pagination amounts and get the current requested amount (default to 20)
         $allowedPerPage = [5, 10, 20, 50, 100];
         $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
 
-        // Fallback to 20 if the user manually tampers with the URL parameter
         if (!in_array($perPage, $allowedPerPage)) {
             $perPage = 20;
         }
 
-        // Fetch all pastes, globally ignoring the active scope to see expired ones
-        // Added 'pastes_page' to prevent pagination conflicts with the users tab
-        $pastes = Paste::withoutGlobalScopes()
-            ->with('user')
-            ->latest()
+        $pastesQuery = Paste::withoutGlobalScopes()->with('user');
+        $usersQuery = User::query();
+
+        if ($search) {
+            // Filter pastes by title, syntax, or the author's name
+            $pastesQuery->where(function($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('syntax', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+
+            // Filter users by name or email
+            $usersQuery->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        $pastes = $pastesQuery->latest()
             ->paginate($perPage, ['*'], 'pastes_page')
             ->appends($request->query());
 
-        // Fetch all users for the new Admin Dashboard tab
-        // Added 'users_page' to prevent pagination conflicts with the pastes tab
-        $users = User::latest()
+        $users = $usersQuery->latest()
             ->paginate($perPage, ['*'], 'users_page')
             ->appends($request->query());
 
-        // Pass both variables to the view
-        return view('admin.dashboard', compact('pastes', 'users', 'perPage'));
+        return view('admin.dashboard', compact('pastes', 'users', 'perPage', 'search'));
     }
 
     public function destroy($slug)
     {
-        // Admin can delete any paste
         $paste = Paste::withoutGlobalScopes()->where('slug', $slug)->firstOrFail();
         $paste->delete();
 
@@ -48,7 +59,6 @@ class AdminController extends Controller
 
     public function destroyUser(User $user)
     {
-        // Prevent admins from deleting themselves
         if (auth()->id() === $user->id) {
             return back()->with('error', 'You cannot delete your own account.');
         }
