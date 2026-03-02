@@ -23,65 +23,8 @@
         </div>
     @endif
 
-    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <form method="GET" action="{{ route('dashboard') }}" class="w-full md:w-1/3 relative flex gap-2">
-            @if(request('per_page'))
-                <input type="hidden" name="per_page" value="{{ request('per_page') }}">
-            @endif
-            <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" name="search" value="{{ request('search') }}" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5 transition-colors" placeholder="Search snippets...">
-            </div>
-            @if(request('search'))
-                <a href="{{ route('dashboard', ['per_page' => request('per_page')]) }}" class="flex items-center justify-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium border border-slate-200 dark:border-slate-700" title="Clear Search">
-                    Clear
-                </a>
-            @endif
-        </form>
-
-        <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <span class="font-medium">Show</span>
-
-            <div x-data="{
-                open: false,
-                dropUp: false,
-                reposition() {
-                    if (!this.$refs.button) return;
-                    const rect = this.$refs.button.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    this.dropUp = spaceBelow < 180 && rect.top > spaceBelow;
-                }
-            }"
-            @click.away="open = false"
-            @scroll.window="open ? reposition() : null"
-            @resize.window="open ? reposition() : null"
-            class="relative">
-                <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer font-semibold shadow-sm min-w-[4rem] justify-between">
-                    <span>{{ $perPage ?? 10 }}</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms
-                    :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
-                    class="absolute right-0 z-50 w-full min-w-[4rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 text-sm text-center" style="display: none;">
-                    @foreach([5, 10, 20, 50, 100] as $value)
-                        <li>
-                            <a href="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}"
-                            class="block px-3 py-1.5 transition-colors {{ ($perPage ?? 10) == $value ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400' }}">
-                                {{ $value }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <span class="font-medium">entries</span>
-        </div>
-    </div>
-
-    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-        <table class="w-full text-left border-collapse">
+    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+        <table id="pastesTable" class="w-full text-left border-collapse stripe hover">
             <thead>
                 <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                     <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Title</th>
@@ -93,7 +36,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                @forelse($pastes as $paste)
+                @foreach($pastes as $paste)
                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition group">
                         <td class="p-4 font-medium">
                             <a href="{{ route('pastes.show', $paste) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition">
@@ -114,7 +57,9 @@
                                 <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-emerald-100 dark:border-emerald-500/20">Active</span>
                             @endif
                         </td>
-                        <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $paste->created_at->format('M d, Y H:i') }}</td>
+                        <td class="p-4 text-sm text-slate-500 dark:text-slate-400" data-order="{{ $paste->created_at->timestamp }}">
+                            {{ $paste->created_at->format('M d, Y H:i') }}
+                        </td>
                         <td class="p-4 text-right">
                             <div class="flex justify-end items-center gap-3">
                                 <a target="_blank" href="{{ route('pastes.show', $paste) }}" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition">View</a>
@@ -126,34 +71,29 @@
                             </div>
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="p-12 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-200 dark:text-indigo-500/50 rounded-full flex items-center justify-center mb-4">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                </div>
-
-                                @if(request('search'))
-                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No results found</h3>
-                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">We couldn't find any snippets matching "{{ request('search') }}".</p>
-                                    <a href="{{ route('dashboard') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Clear search</a>
-                                @else
-                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No pastes yet</h3>
-                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Looks like your dashboard is a blank slate. Let's change that!</p>
-                                    <a href="{{ route('pastes.create') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Create your first paste &rarr;</a>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
 
-    <div class="mt-6">
-        {{ $pastes->links() }}
-    </div>
-
 </div>
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#pastesTable').DataTable({
+            responsive: true,
+            order: [[4, 'desc']], // Sort by "Created" column descending
+            language: {
+                search: "", // Remove "Search:" label
+                searchPlaceholder: "Search snippets...",
+                emptyTable: "Looks like your dashboard is a blank slate. Let's create your first paste!"
+            },
+            columnDefs: [
+                { orderable: false, targets: 5 } // Disable sorting on the Actions column
+            ]
+        });
+    });
+</script>
+@endpush
 @endsection

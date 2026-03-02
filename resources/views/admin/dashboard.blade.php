@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto w-full mt-4 p-6 md:p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-rose-100 dark:border-rose-900/30 transition-colors"
      x-data="{ activeTab: localStorage.getItem('adminActiveTab') || 'pastes' }"
-     x-init="$watch('activeTab', value => localStorage.setItem('adminActiveTab', value))">
+     x-init="$watch('activeTab', value => { localStorage.setItem('adminActiveTab', value); $dispatch('tab-changed', value); })">
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -46,66 +46,9 @@
         </button>
     </div>
 
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="w-full md:w-1/3 relative flex gap-2">
-            @if(request('per_page'))
-                <input type="hidden" name="per_page" value="{{ request('per_page') }}">
-            @endif
-            <div class="relative w-full">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <input type="text" name="search" value="{{ request('search') }}" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5 transition-colors" placeholder="Search users or snippets...">
-            </div>
-            @if(request('search'))
-                <a href="{{ route('admin.dashboard', ['per_page' => request('per_page')]) }}" class="flex items-center justify-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium border border-slate-200 dark:border-slate-700" title="Clear Search">
-                    Clear
-                </a>
-            @endif
-        </form>
-
-        <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <span class="font-medium">Show</span>
-
-            <div x-data="{
-                open: false,
-                dropUp: false,
-                reposition() {
-                    if (!this.$refs.button) return;
-                    const rect = this.$refs.button.getBoundingClientRect();
-                    const spaceBelow = window.innerHeight - rect.bottom;
-                    this.dropUp = spaceBelow < 180 && rect.top > spaceBelow;
-                }
-            }"
-            @click.away="open = false"
-            @scroll.window="open ? reposition() : null"
-            @resize.window="open ? reposition() : null"
-            class="relative">
-                <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer font-semibold shadow-sm min-w-[4rem] justify-between">
-                    <span>{{ $perPage ?? 10 }}</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <ul x-show="open" x-transition.opacity.duration.200ms
-                    :class="dropUp ? 'bottom-full mb-1' : 'top-full mt-1'"
-                    class="absolute right-0 z-50 w-full min-w-[4rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg py-1 text-sm text-center" style="display: none;">
-                    @foreach([5, 10, 20, 50, 100] as $value)
-                        <li>
-                            <a href="{{ request()->fullUrlWithQuery(['per_page' => $value]) }}"
-                            class="block px-3 py-1.5 transition-colors {{ ($perPage ?? 10) == $value ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400' }}">
-                                {{ $value }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-
-            <span class="font-medium">entries</span>
-        </div>
-    </div>
-
     <div x-show="activeTab === 'pastes'" x-cloak>
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+            <table id="adminPastesTable" class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">Title</th>
@@ -118,7 +61,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    @forelse($pastes as $paste)
+                    @foreach($pastes as $paste)
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition group">
                             <td class="p-4 font-medium">
                                 <a href="{{ route('pastes.show', $paste) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 transition">
@@ -142,7 +85,9 @@
                                     <span class="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-emerald-100 dark:border-emerald-500/20">Active</span>
                                 @endif
                             </td>
-                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $paste->created_at->format('M d, Y H:i') }}</td>
+                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400" data-order="{{ $paste->created_at->timestamp }}">
+                                {{ $paste->created_at->format('M d, Y H:i') }}
+                            </td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end items-center gap-3">
                                     <a target="_blank" href="{{ route('pastes.show', $paste) }}" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition">View</a>
@@ -154,29 +99,15 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-12 text-center text-slate-500">
-                                @if(request('search'))
-                                    No pastes found matching "{{ request('search') }}".
-                                @else
-                                    No pastes exist on the platform yet.
-                                @endif
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
-        </div>
-
-        <div class="mt-6">
-            {{ $pastes->links() ?? '' }}
         </div>
     </div>
 
     <div x-show="activeTab === 'users'" x-cloak>
-        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table class="w-full text-left border-collapse">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+            <table id="adminUsersTable" class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                         <th class="p-4 font-semibold text-sm text-slate-600 dark:text-slate-400">User</th>
@@ -187,7 +118,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    @forelse($users ?? [] as $user)
+                    @foreach($users ?? [] as $user)
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition group">
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
@@ -209,7 +140,9 @@
                                     <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-md text-xs font-bold tracking-wide border border-slate-200 dark:border-slate-700">User</span>
                                 @endif
                             </td>
-                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400">{{ $user->created_at->format('M d, Y H:i') }}</td>
+                            <td class="p-4 text-sm text-slate-500 dark:text-slate-400" data-order="{{ $user->created_at->timestamp }}">
+                                {{ $user->created_at->format('M d, Y H:i') }}
+                            </td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end items-center gap-3">
                                     <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="confirmDelete(event, this, 'user');">
@@ -220,25 +153,41 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="p-12 text-center text-slate-500">
-                                @if(request('search'))
-                                    No users found matching "{{ request('search') }}".
-                                @else
-                                    No users found on the platform.
-                                @endif
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
-        </div>
-
-        <div class="mt-6">
-            {{ $users->links() ?? '' }}
         </div>
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Init Pastes Table
+        let pastesTable = $('#adminPastesTable').DataTable({
+            responsive: true,
+            order: [[5, 'desc']], // Created At
+            language: { search: "", searchPlaceholder: "Search pastes..." },
+            columnDefs: [{ orderable: false, targets: 6 }]
+        });
+
+        // Init Users Table
+        let usersTable = $('#adminUsersTable').DataTable({
+            responsive: true,
+            order: [[3, 'desc']], // Joined Time
+            language: { search: "", searchPlaceholder: "Search users..." },
+            columnDefs: [{ orderable: false, targets: 4 }]
+        });
+
+        // Recalculate columns widths on Alpine tab switch
+        window.addEventListener('tab-changed', event => {
+            setTimeout(() => {
+                if(event.detail === 'pastes') pastesTable.columns.adjust();
+                if(event.detail === 'users') usersTable.columns.adjust();
+            }, 50);
+        });
+    });
+</script>
+@endpush
 @endsection
