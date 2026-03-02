@@ -22,15 +22,23 @@
             {{ session('success') }}
         </div>
     @endif
+
     <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <form method="GET" action="{{ route('dashboard') }}" class="w-full md:w-1/3 relative">
+        <form method="GET" action="{{ route('dashboard') }}" class="w-full md:w-1/3 relative flex gap-2">
             @if(request('per_page'))
                 <input type="hidden" name="per_page" value="{{ request('per_page') }}">
             @endif
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" name="search" value="{{ request('search') }}" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5 transition-colors" placeholder="Search snippets...">
             </div>
-            <input type="text" name="search" value="{{ request('search') }}" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5 transition-colors" placeholder="Search snippets...">
+            @if(request('search'))
+                <a href="{{ route('dashboard', ['per_page' => request('per_page')]) }}" class="flex items-center justify-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium border border-slate-200 dark:border-slate-700" title="Clear Search">
+                    Clear
+                </a>
+            @endif
         </form>
 
         <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
@@ -71,6 +79,7 @@
             <span class="font-medium">entries</span>
         </div>
     </div>
+
     <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -109,7 +118,7 @@
                         <td class="p-4 text-right">
                             <div class="flex justify-end items-center gap-3">
                                 <a target="_blank" href="{{ route('pastes.show', $paste) }}" class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 transition">View</a>
-                                <form action="{{ route('admin.pastes.destroy', $paste) }}" method="POST" onsubmit="confirmDelete(event, this);">
+                                <form action="{{ route('pastes.destroy', $paste->slug) }}" method="POST" onsubmit="confirmDelete(event, this);">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-sm font-medium text-rose-500 hover:text-rose-700 transition">Delete</button>
@@ -124,9 +133,16 @@
                                 <div class="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-200 dark:text-indigo-500/50 rounded-full flex items-center justify-center mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 </div>
-                                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No pastes yet</h3>
-                                <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Looks like your dashboard is a blank slate. Let's change that!</p>
-                                <a href="{{ route('pastes.create') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Create your first paste &rarr;</a>
+
+                                @if(request('search'))
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No results found</h3>
+                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">We couldn't find any snippets matching "{{ request('search') }}".</p>
+                                    <a href="{{ route('dashboard') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Clear search</a>
+                                @else
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-300 mb-1">No pastes yet</h3>
+                                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Looks like your dashboard is a blank slate. Let's change that!</p>
+                                    <a href="{{ route('pastes.create') }}" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Create your first paste &rarr;</a>
+                                @endif
                             </div>
                         </td>
                     </tr>
