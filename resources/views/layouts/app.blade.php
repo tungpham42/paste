@@ -407,7 +407,7 @@
                     if (isAdBlockActive || isHidden) {
                         Swal.fire({
                             title: 'Ad Blocker Detected 🛑',
-                            html: 'It looks like you are using an ad blocker.<br><br>Ads help keep <strong>SOFT Paste</strong> running and free for everyone. Please consider whitelisting our site!',
+                            html: 'It looks like you are using an ad blocker.<br><br>Ads help keep <strong>SOFT Paste</strong> running and free for everyone. Please consider whitelisting our site or login with an account!',
                             icon: 'warning',
                             confirmButtonText: 'I Understand',
                             allowOutsideClick: false, // Optional: forces them to click the button
