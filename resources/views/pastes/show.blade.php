@@ -13,18 +13,15 @@
         }
 
         /* Force Wrap overrides for Prism */
-        pre.whitespace-pre-wrap {
-            white-space: pre-wrap !important;
-            word-break: break-word !important;
-            padding-left: 1.5rem !important; /* Reset padding when line numbers are hidden */
-        }
+        pre.whitespace-pre-wrap,
         code.whitespace-pre-wrap {
             white-space: pre-wrap !important;
             word-break: break-word !important;
         }
-        /* Hide Prism line numbers when wrapped (physical lines != visual wraps) */
-        pre.whitespace-pre-wrap .line-numbers-rows {
-            display: none !important;
+
+        /* Force line numbers back to a single line height when unwrapped */
+        pre:not(.whitespace-pre-wrap) .line-numbers-rows > span {
+            height: auto !important;
         }
     </style>
 @endpush
@@ -82,8 +79,9 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-start md:justify-end gap-3 w-full mb-6">
-        <button @click="wrapText = !wrapText" class="flex-1 md:flex-none justify-center flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all text-sm font-semibold shadow-sm"
-                :class="wrapText ? 'ring-2 ring-indigo-500 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : ''">
+        <button @click="wrapText = !wrapText; $nextTick(() => { setTimeout(() => window.dispatchEvent(new Event('resize')), 50) })"
+            class="flex-1 md:flex-none justify-center flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all text-sm font-semibold shadow-sm"
+            :class="wrapText ? 'ring-2 ring-indigo-500 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : ''">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
             <span x-text="wrapText ? 'Unwrap' : 'Wrap'"></span>
         </button>
