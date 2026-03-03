@@ -168,7 +168,14 @@
         let pastesTable = $('#adminPastesTable').DataTable({
             responsive: true,
             order: [[5, 'desc']], // Created At
-            language: { search: "", searchPlaceholder: "Search pastes..." },
+            language: {
+                search: "",
+                searchPlaceholder: "Search pastes...",
+                lengthMenu: "Show _MENU_ snippets per page", // Added custom entry text
+                info: "Showing _START_ to _END_ of _TOTAL_ snippets", // Added custom info text
+                infoEmpty: "Showing 0 to 0 of 0 snippets",
+                infoFiltered: "(filtered from _MAX_ total snippets)"
+            },
             columnDefs: [{ orderable: false, targets: 6 }]
         });
 
@@ -176,7 +183,14 @@
         let usersTable = $('#adminUsersTable').DataTable({
             responsive: true,
             order: [[3, 'desc']], // Joined Time
-            language: { search: "", searchPlaceholder: "Search users..." },
+            language: {
+                search: "",
+                searchPlaceholder: "Search users...",
+                lengthMenu: "Show _MENU_ users per page", // Added custom entry text
+                info: "Showing _START_ to _END_ of _TOTAL_ users", // Added custom info text
+                infoEmpty: "Showing 0 to 0 of 0 users",
+                infoFiltered: "(filtered from _MAX_ total users)"
+            },
             columnDefs: [{ orderable: false, targets: 4 }]
         });
 

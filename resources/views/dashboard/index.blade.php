@@ -85,8 +85,12 @@
             responsive: true,
             order: [[4, 'desc']], // Sort by "Created" column descending
             language: {
-                search: "", // Remove "Search:" label
-                searchPlaceholder: "Search snippets...",
+                search: "",
+                searchPlaceholder: "Search pastes...",
+                lengthMenu: "Show _MENU_ snippets per page", // Added custom entry text
+                info: "Showing _START_ to _END_ of _TOTAL_ snippets", // Added custom info text
+                infoEmpty: "Showing 0 to 0 of 0 snippets",
+                infoFiltered: "(filtered from _MAX_ total snippets)",
                 emptyTable: "Looks like your dashboard is a blank slate. Let's create your first paste!"
             },
             columnDefs: [
