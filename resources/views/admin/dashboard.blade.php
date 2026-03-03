@@ -162,37 +162,91 @@
 </div>
 
 @push('scripts')
+@push('scripts')
 <script>
+    // Reusable function to inject an Alpine dropdown matching create.blade.php
+    function applyCustomAlpineLengthMenu(tableId, itemLabel) {
+        const dtLengthContainer = $('#' + tableId + '_wrapper .dt-length');
+        if (dtLengthContainer.length) {
+            // Hide default DataTables length elements natively
+            dtLengthContainer.children().hide();
+
+            // Inject the custom Alpine.js dropdown matching your UI
+            const dropdownHTML = `
+                <div class="flex items-center gap-3">
+                    <label class="font-semibold text-sm text-slate-700 dark:text-slate-300">Show</label>
+                    <div x-data="{
+                        open: false,
+                        dropUp: false,
+                        value: '10',
+                        options: { '10': '10', '25': '25', '50': '50', '100': '100' },
+                        get selectedLabel() { return this.options[this.value]; },
+                        reposition() {
+                            if (!this.$refs.button) return;
+                            const rect = this.$refs.button.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            this.dropUp = spaceBelow < 260 && rect.top > spaceBelow;
+                        }
+                    }"
+                    @click.away="open = false"
+                    @scroll.window="open ? reposition() : null"
+                    @resize.window="open ? reposition() : null"
+                    class="relative min-w-[4.5rem]">
+                        <button x-ref="button" @click="open = !open; if(open) $nextTick(() => reposition())" type="button" class="w-full flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-1.5 px-3 rounded-lg focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm transition shadow-sm">
+                            <span x-text="selectedLabel"></span>
+                            <svg class="w-4 h-4 text-slate-400 transition-transform ml-2" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <ul x-show="open" x-transition.opacity.duration.200ms
+                            :class="dropUp ? 'bottom-full mb-2' : 'top-full mt-2'"
+                            class="absolute z-50 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto py-1 text-sm" style="display: none;">
+                            <template x-for="(label, key) in options" :key="key">
+                                <li @click="value = key; open = false; $('#${tableId}').DataTable().page.len(parseInt(key)).draw();"
+                                    class="px-4 py-2 cursor-pointer transition-colors"
+                                    :class="value === key ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-indigo-600 dark:hover:text-indigo-400'">
+                                    <span x-text="label"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    <label class="font-semibold text-sm text-slate-700 dark:text-slate-300">${itemLabel} per page</label>
+                </div>
+            `;
+            dtLengthContainer.append(dropdownHTML);
+        }
+    }
+
     $(document).ready(function() {
         // Init Pastes Table
         let pastesTable = $('#adminPastesTable').DataTable({
             responsive: true,
-            order: [[5, 'desc']], // Created At
+            order: [[5, 'desc']],
             language: {
                 search: "",
                 searchPlaceholder: "Search pastes...",
-                lengthMenu: "Show _MENU_ snippets per page", // Added custom entry text
-                info: "Showing _START_ to _END_ of _TOTAL_ snippets", // Added custom info text
+                info: "Showing _START_ to _END_ of _TOTAL_ snippets",
                 infoEmpty: "Showing 0 to 0 of 0 snippets",
                 infoFiltered: "(filtered from _MAX_ total snippets)"
             },
             columnDefs: [{ orderable: false, targets: 6 }]
         });
 
+        applyCustomAlpineLengthMenu('adminPastesTable', 'snippets');
+
         // Init Users Table
         let usersTable = $('#adminUsersTable').DataTable({
             responsive: true,
-            order: [[3, 'desc']], // Joined Time
+            order: [[3, 'desc']],
             language: {
                 search: "",
                 searchPlaceholder: "Search users...",
-                lengthMenu: "Show _MENU_ users per page", // Added custom entry text
-                info: "Showing _START_ to _END_ of _TOTAL_ users", // Added custom info text
+                info: "Showing _START_ to _END_ of _TOTAL_ users",
                 infoEmpty: "Showing 0 to 0 of 0 users",
                 infoFiltered: "(filtered from _MAX_ total users)"
             },
             columnDefs: [{ orderable: false, targets: 4 }]
         });
+
+        applyCustomAlpineLengthMenu('adminUsersTable', 'users');
 
         // Recalculate columns widths on Alpine tab switch
         window.addEventListener('tab-changed', event => {
