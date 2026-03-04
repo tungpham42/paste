@@ -206,13 +206,60 @@
         @yield('content')
     </main>
 
-    <div class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex flex-col gap-3">
+    <footer class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 mt-auto transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <div class="flex flex-col items-center md:items-start gap-1">
+                <span class="text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">
+                    SOFT Paste
+                </span>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                    &copy; {{ date('Y') }} SOFT Paste. All rights reserved.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-6 text-sm font-medium">
+                <a href="{{ route('terms') }}" class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                    Terms of Service
+                </a>
+                <a href="{{ route('privacy') }}" class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                    Privacy Policy
+                </a>
+                <a href="mailto:soft.io.vn@gmail.com" class="text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                    Contact
+                </a>
+            </div>
+
+        </div>
+    </footer>
+
+    <div x-data="{
+            showTop: false,
+            showBottom: false,
+            handleScroll() {
+                const scrollY = window.scrollY;
+                const innerHeight = window.innerHeight;
+                const scrollHeight = document.documentElement.scrollHeight;
+                const footerHeight = document.querySelector('footer') ? document.querySelector('footer').offsetHeight : 150;
+
+                // Check if user has scrolled down past the 200px threshold
+                const scrolledDown = scrollY > 200;
+
+                // Check if the bottom of the viewport has reached the footer (with a 20px buffer)
+                const reachedFooter = (scrollY + innerHeight) >= (scrollHeight - footerHeight - 20);
+
+                // Update button visibility
+                this.showTop = scrolledDown && !reachedFooter;
+                this.showBottom = !reachedFooter && (innerHeight + scrollY) < (scrollHeight - 200);
+            }
+        }"
+        x-init="handleScroll()"
+        @scroll.window="handleScroll()"
+        @resize.window="handleScroll()"
+        class="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 flex flex-col gap-3"
+        x-cloak>
 
         <button
-            x-data="{ showBottom: true }"
-            x-init="showBottom = (window.innerHeight + window.scrollY) < document.documentElement.scrollHeight - 200"
-            @scroll.window="showBottom = (window.innerHeight + window.scrollY) < document.documentElement.scrollHeight - 200"
-            @resize.window="showBottom = (window.innerHeight + window.scrollY) < document.documentElement.scrollHeight - 200"
             @click="window.scrollTo({top: document.documentElement.scrollHeight, behavior: 'smooth'})"
             x-show="showBottom"
             x-transition:enter="transition ease-out duration-300"
@@ -229,8 +276,6 @@
         </button>
 
         <button
-            x-data="{ showTop: false }"
-            @scroll.window="showTop = window.scrollY > 200"
             @click="window.scrollTo({top: 0, behavior: 'smooth'})"
             x-show="showTop"
             x-transition:enter="transition ease-out duration-300"

@@ -67,6 +67,12 @@ Route::middleware('auth')->group(function () {
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // -----------------------------------------------------------------------------
+// Legal Pages (MUST go above the wildcard)
+// -----------------------------------------------------------------------------
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/privacy', 'privacy')->name('privacy');
+
+// -----------------------------------------------------------------------------
 // Wildcard Route (Must go LAST)
 // -----------------------------------------------------------------------------
 Route::get('/{paste}/raw', [PasteController::class, 'raw'])->name('pastes.raw');
