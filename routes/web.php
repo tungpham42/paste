@@ -69,8 +69,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 // -----------------------------------------------------------------------------
 // Legal Pages (MUST go above the wildcard)
 // -----------------------------------------------------------------------------
-Route::view('/terms', 'terms')->name('terms');
-Route::view('/privacy', 'privacy')->name('privacy');
+Route::view('/terms-of-service', 'terms')->name('terms');
+Route::view('/privacy-policy', 'privacy')->name('privacy');
 
 // -----------------------------------------------------------------------------
 // Wildcard Route (Must go LAST)
