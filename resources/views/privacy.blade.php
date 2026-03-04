@@ -50,7 +50,7 @@
             <section>
                 <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-3">5. Contact Us</h2>
                 <p>
-                    If you have any questions about this Privacy Policy or wish to request the deletion of your data, please contact us at <a href="mailto:support@softpaste.com" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">support@softpaste.com</a>.
+                    If you have any questions about this Privacy Policy or wish to request the deletion of your data, please contact us at <a href="mailto:soft.io.vn@gmail.com" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">soft.io.vn@gmail.com</a>.
                 </p>
             </section>
 
